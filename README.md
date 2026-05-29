@@ -40,4 +40,4 @@ consulte a un abogado laboralista o al Ministerio de Trabajo de Colombia.
 
 ---
 
-Desarrollado con ❤️ para trabajadores y empleadores colombianos.
+Desarrollado para trabajadores y empleadores colombianos.

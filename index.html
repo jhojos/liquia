@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0"/>
+<title>Liquia | Calculadora de Liquidación Laboral en Colombia 2026</title>
+<meta name="description" content="Liquia: calcula tu liquidación laboral en Colombia en minutos. Cesantías, prima, vacaciones e indemnización según el CST y SMMLV 2026. Gratis y sin registro."/>
+<meta name="keywords" content="liquia, liquidación laboral colombia, calculadora liquidación laboral, calculadora liquia, cesantías colombia, prima de servicios, vacaciones colombia, indemnización laboral, prestaciones sociales colombia, liquidación contrato, finiquito laboral, calculadora laboral 2026, liquidación empleada doméstica, SMMLV 2026"/>
+<meta name="robots" content="index, follow"/>
+<meta name="author" content="Liquia"/>
+<meta name="theme-color" content="#0c3a5e"/>
+<link rel="canonical" href="https://liquia.co/"/>
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+<meta property="og:type" content="website"/>
+<meta property="og:locale" content="es_CO"/>
+<meta property="og:url" content="https://liquia.co/"/>
+<meta property="og:site_name" content="Liquia"/>
+<meta property="og:title" content="Liquia | Calculadora de Liquidación Laboral en Colombia"/>
+<meta property="og:description" content="Calcula gratis tu liquidación laboral en Colombia con Liquia. Cesantías, prima, vacaciones e indemnización según ley vigente. SMMLV 2026."/>
+<!-- Twitter / X Cards -->
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Liquia | Calculadora de Liquidación Laboral en Colombia"/>
+<meta name="twitter:description" content="Herramienta gratuita: cesantías, prima, vacaciones e indemnización según el CST. SMMLV 2026 incluido."/>
+<!-- Schema: SoftwareApplication -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Liquia | Calculadora de Liquidación Laboral en Colombia","description":"Herramienta gratuita para calcular liquidaciones laborales en Colombia según el Código Sustantivo del Trabajo, Ley 2466 de 2025 y Decreto 0159 de 2026.","applicationCategory":"FinanceApplication","operatingSystem":"Web","url":"https://liquia.co/","inLanguage":"es-CO","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"COP"},"audience":{"@type":"Audience","audienceType":"Trabajadores y empleadores colombianos"},"featureList":["Cálculo de cesantías","Intereses sobre cesantías","Prima de servicios","Vacaciones compensadas","Indemnización por despido","Informe PDF descargable","Soporte teletrabajo Ley 2466/2025"]}
+</script>
+<!-- Schema: FAQPage -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Cómo se calcula la liquidación laboral en Colombia?","acceptedAnswer":{"@type":"Answer","text":"La liquidación laboral en Colombia incluye: cesantías (salario con auxilio × días / 360), intereses sobre cesantías (12% anual), prima de servicios (salario con auxilio × días semestre / 360), vacaciones compensadas (salario sin auxilio / 30 × días netos) e indemnización si aplica (Art. 64 CST)."}},{"@type":"Question","name":"¿Cuánto es el SMMLV en Colombia en 2026?","acceptedAnswer":{"@type":"Answer","text":"El Salario Mínimo Mensual Legal Vigente (SMMLV) en Colombia para 2026 es de $1.750.905, según el Decreto 0159 de 2026. El auxilio de transporte es de $249.095."}},{"@type":"Question","name":"¿Cuánto tiempo tengo para reclamar una liquidación laboral?","acceptedAnswer":{"@type":"Answer","text":"Las acciones laborales en Colombia prescriben a los 3 años contados desde la exigibilidad del derecho, según el artículo 488 del Código Sustantivo del Trabajo (CST)."}},{"@type":"Question","name":"¿Qué incluye una liquidación laboral en Colombia?","acceptedAnswer":{"@type":"Answer","text":"Una liquidación laboral en Colombia incluye: cesantías, intereses sobre cesantías (12% anual), prima de servicios del semestre en curso, vacaciones pendientes y, si aplica, indemnización por despido sin justa causa."}},{"@type":"Question","name":"¿Se puede liquidar empleada doméstica con esta herramienta?","acceptedAnswer":{"@type":"Answer","text":"Sí. Los trabajadores domésticos tienen los mismos derechos a prestaciones sociales que cualquier trabajador bajo el CST (Ley 1788 de 2016). La calculadora aplica para todos los tipos de contrato, incluyendo servicio doméstico."}}]}
+</script>
+<!-- Schema: Organization -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"Liquia","url":"https://liquia.co/","description":"Plataforma de herramientas laborales para trabajadores y empleadores colombianos."}
+</script>
+<!-- Fonts: carga no bloqueante — la app funciona con fuentes del sistema si fallan -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preload" as="style"
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+  onload="this.onload=null;this.rel='stylesheet'"/>
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"/>
+</noscript>
+<!-- jsPDF se carga bajo demanda al generar el PDF, no bloquea la carga inicial -->
+<style>
+/* ============================================================
+   DESIGN TOKENS — mobile-first, warm institutional palette
+   ============================================================ */
+:root{
+  --brand:#0c3a5e; --brand-mid:#1e5c8e; --brand-dark:#082a49;
+  --brand-light:#e1eff9; --brand-50:#f0f7fd;
+  --accent:#c47f17; --accent-dark:#9e6510; --accent-light:#fef5e4;
+  --green:#1a6b4a; --green-bg:#e6f4ec;
+  --red:#9b1c1c; --red-bg:#fdecea;
+  --amber:#8a5c00; --amber-bg:#fdf4e3;
+  --bg:#f6f4f0; --surface:#fff;
+  --s2:#faf9f7; --border:#e0dbd4;
+  --border-s:#c5bcb2; --text:#1a1915;
+  --t2:#4a4640; --muted:#8a837b;
+  --font:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --mono:'IBM Plex Mono','SF Mono','Consolas','Courier New',monospace;
+  --r:8px; --r-lg:14px; --r-xl:20px;
+  --sh:0 1px 3px rgba(12,58,94,.08),0 1px 2px rgba(12,58,94,.05);
+  --sh-md:0 4px 12px rgba(12,58,94,.10),0 2px 4px rgba(12,58,94,.06);
+  --sh-lg:0 8px 28px rgba(12,58,94,.12),0 3px 8px rgba(12,58,94,.07);
+}
+
+/* ---- Reset & Base ---- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);
+  line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+h1,h2,h3,h4,h5{line-height:1.25;font-weight:600;color:var(--text)}
+p,span,div{line-height:1.55}
+a{color:var(--brand);text-decoration:none}
+button{cursor:pointer;font-family:var(--font)}
+input,select,textarea{font-family:var(--font)}
+img{max-width:100%;height:auto}
+
+/* ---- App Shell ---- */
+.app{display:flex;flex-direction:column;min-height:100vh}
+.app-header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)
+}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:600;font-size:15px}
+.brand-mark{
+  width:32px;height:32px;background:var(--brand);border-radius:6px;
+  display:grid;place-items:center;color:#fff;font-family:var(--mono);
+  font-size:11px;font-weight:500;letter-spacing:.02em;flex-shrink:0
+}
+.brand-mark::before{content:"LQ"}
+.brand-name{display:flex;flex-direction:column;gap:0}
+.brand-title{font-size:14px;font-weight:600;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--muted);font-weight:400}
+.header-date{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;display:none}
+@media(min-width:600px){.header-date{display:block}}
+
+.main{flex:1;padding:0 0 80px}
+.app-footer{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:20px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7
+}
+.app-footer strong{color:var(--t2);font-weight:500}
+
+/* ---- Screens ---- */
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn 160ms ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---- Ad Slots ---- */
+.ad-slot{
+  width:100%;background:var(--s2);border:1px dashed var(--border-s);
+  border-radius:var(--r);display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:11px;font-family:var(--mono);overflow:hidden;
+  text-align:center
+}
+.ad-slot-sm{min-height:52px}
+.ad-slot-md{min-height:120px}
+.ad-slot-rect{min-height:260px}
+@media(min-width:728px){.ad-slot-banner{min-height:92px}}
+.ad-inner{padding:12px;pointer-events:none}
+.ad-inner .ad-label{display:block;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.ad-inner .ad-dims{font-size:10px;opacity:.6}
+
+/* ---- Typography ---- */
+.text-lg{font-size:18px} .text-sm{font-size:14px}
+.text-xs{font-size:12px} .text-muted{color:var(--muted)}
+.mono{font-family:var(--mono)} .tabnum{font-variant-numeric:tabular-nums}
+.fw-500{font-weight:500} .fw-600{font-weight:600} .fw-700{font-weight:700}
+
+/* ---- Containers ---- */
+.container{max-width:860px;width:100%;margin:0 auto;padding:0 20px}
+.container-sm{max-width:560px;width:100%;margin:0 auto;padding:0 20px}
+.container-lg{max-width:1100px;width:100%;margin:0 auto;padding:0 20px}
+@media(min-width:600px){.container,.container-sm,.container-lg{padding:0 28px}}
+
+/* ---- Cards ---- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh)}
+.card-body{padding:24px 20px}
+@media(min-width:600px){.card-body{padding:28px 28px}}
+
+/* ---- Buttons ---- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:var(--r);border:1px solid var(--border-s);
+  background:var(--surface);color:var(--text);font-size:15px;font-weight:500;
+  font-family:var(--font);line-height:1;transition:background 100ms,border-color 100ms,transform 80ms;
+  white-space:nowrap;min-height:46px
+}
+.btn:hover{background:#f0ede8}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn-primary:hover{background:var(--brand-dark);border-color:var(--brand-dark)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--t2)}
+.btn-ghost:hover{background:#f0ede8}
+.btn-lg{padding:15px 28px;font-size:16px;min-height:52px;border-radius:var(--r)}
+.btn-sm{padding:8px 14px;font-size:13px;min-height:38px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.45;pointer-events:none}
+.btn-danger{background:var(--red-bg);color:var(--red);border-color:#f8c8c8}
+
+/* ---- Form ---- */
+.field{display:flex;flex-direction:column;gap:6px}
+.field-label{font-size:13px;font-weight:500;color:var(--t2)}
+.field-hint{font-size:12px;color:var(--muted);line-height:1.45}
+.field-error{font-size:12px;color:var(--red);font-weight:500;display:none}
+.field-error.visible{display:block}
+input[type="text"],input[type="number"],input[type="date"],select,textarea{
+  font-family:var(--font);font-size:16px;padding:12px 14px;
+  border:1.5px solid var(--border-s);border-radius:var(--r);
+  background:var(--surface);color:var(--text);width:100%;
+  transition:border-color 120ms,box-shadow 120ms;
+  -webkit-appearance:none;appearance:none
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--brand);
+  box-shadow:0 0 0 3px rgba(12,58,94,.14)
+}
+input[inputmode="decimal"]{font-family:var(--mono)}
+input.err,select.err{border-color:var(--red)}
+.form-grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:600px){.form-grid{grid-template-columns:repeat(2,1fr)}}
+.form-grid .full{grid-column:1/-1}
+.radio-group{display:flex;flex-wrap:wrap;gap:10px}
+.radio-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 14px;border:1.5px solid var(--border-s);border-radius:var(--r);
+  cursor:pointer;font-size:14px;color:var(--t2);transition:border-color 100ms,background 100ms;
+  min-height:44px
+}
+.radio-btn:has(input:checked){background:var(--brand-50);border-color:var(--brand);color:var(--brand)}
+.radio-btn input{accent-color:var(--brand);margin:0;width:16px;height:16px}
+.checkbox-row{
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  font-size:14px;color:var(--t2);padding:10px 0
+}
+.checkbox-row input{accent-color:var(--brand);width:18px;height:18px;flex-shrink:0}
+
+/* concept rows */
+.concept-row{display:grid;grid-template-columns:2fr 1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--border)}
+.concept-row:last-child{border-bottom:none}
+@media(max-width:480px){.concept-row{grid-template-columns:1fr auto;gap:6px}
+.concept-row .concept-amount{grid-row:1;grid-column:2}
+.concept-row .concept-name{grid-column:1/-1}}
+
+/* month grid for variable salary */
+.month-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:480px){.month-grid{grid-template-columns:repeat(3,1fr)}}
+.month-grid .field-label{font-size:11px;color:var(--muted);margin-bottom:3px}
+
+/* ---- Info box ---- */
+.info-box{
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px 16px;font-size:14px;color:var(--t2)
+}
+.info-box .info-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500;margin-bottom:4px}
+.info-box .info-value{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text)}
+
+/* ---- Disclaimer ---- */
+.disclaimer{
+  background:var(--amber-bg);border:1px solid #e8c36a;border-left:4px solid var(--accent);
+  border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--amber);line-height:1.5
+}
+.disclaimer strong{font-weight:600;color:#6b4500}
+
+/* ---- Bands/Alerts ---- */
+.alert-list{display:flex;flex-direction:column;gap:10px}
+.alert-item{
+  border:1px solid var(--border);border-left:3px solid var(--accent);
+  background:var(--surface);padding:12px 14px;border-radius:var(--r);font-size:14px;line-height:1.5
+}
+.alert-item.critical{border-left-color:var(--red);background:var(--red-bg)}
+.alert-item.info{border-left-color:var(--brand);background:var(--brand-50)}
+.alert-tag{
+  display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;
+  letter-spacing:.08em;font-weight:600;margin-bottom:4px;color:var(--amber)
+}
+.alert-item.critical .alert-tag{color:var(--red)}
+.alert-item.info .alert-tag{color:var(--brand)}
+
+/* ---- Difference bands ---- */
+.band{border-radius:var(--r);padding:16px 18px;border:1px solid;display:flex;gap:14px;align-items:flex-start}
+.band-mark{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.55);flex-shrink:0;white-space:nowrap}
+.band-title{font-weight:600;font-size:15px;margin-bottom:3px}
+.band-body{font-size:13px;line-height:1.5}
+.band-t{background:var(--green-bg);border-color:#a8d9bf;color:var(--green)}
+.band-p{background:var(--brand-light);border-color:#b3cde0;color:var(--brand-mid)}
+.band-s{background:var(--amber-bg);border-color:#e8c36a;color:var(--amber)}
+.band-a{background:var(--red-bg);border-color:#f0b8b8;color:var(--red)}
+
+/* ---- Tables ---- */
+table.data{width:100%;border-collapse:collapse;font-size:14px}
+table.data th,table.data td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+table.data thead th{background:var(--s2);font-weight:600;font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border-s)}
+table.data tr:last-child td{border-bottom:none}
+table.data td.num,table.data th.num{text-align:right;font-family:var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+table.data tr.total td{font-weight:600;background:var(--s2);border-top:2px solid var(--border-s)}
+table.data tr.pos td.diff{color:var(--green)}
+table.data tr.neg td.diff{color:var(--red)}
+
+/* ---- Pills ---- */
+.pill{
+  display:inline-flex;align-items:center;font-family:var(--mono);font-size:11px;
+  padding:3px 9px;border-radius:99px;background:var(--brand-light);
+  color:var(--brand-mid);border:1px solid #c5ddf0;font-weight:500
+}
+.pill-amber{background:var(--accent-light);color:var(--accent-dark);border-color:#e8c36a}
+.pill-green{background:var(--green-bg);color:var(--green);border-color:#a8d9bf}
+.pill-red{background:var(--red-bg);color:var(--red);border-color:#f0b8b8}
+
+/* ---- Divider ---- */
+.divider{height:1px;background:var(--border);margin:20px 0}
+.divider-sm{height:1px;background:var(--border);margin:12px 0}
+
+/* ---- Stack / Row helpers ---- */
+.stack{display:flex;flex-direction:column}
+.gap-4{gap:4px}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-20{gap:20px}.gap-24{gap:24px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.mt-4{margin-top:4px}.mt-8{margin-top:8px}.mt-12{margin-top:12px}
+.mt-16{margin-top:16px}.mt-20{margin-top:20px}.mt-24{margin-top:24px}
+.mb-4{margin-bottom:4px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}
+.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-24{margin-bottom:24px}
+
+/* ================================================================
+   ROL SELECTION SCREEN
+   ================================================================ */
+.rol-wrap{padding:32px 20px 48px;max-width:600px;margin:0 auto}
+@media(min-width:600px){.rol-wrap{padding:48px 28px 64px}}
+.rol-header{text-align:center;margin-bottom:32px}
+.rol-header h2{font-size:24px;margin-bottom:8px}
+@media(min-width:600px){.rol-header h2{font-size:30px}}
+.rol-header p{color:var(--muted);font-size:15px;max-width:38ch;margin:0 auto}
+.rol-cards{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:480px){.rol-cards{grid-template-columns:repeat(2,1fr)}}
+.rol-card{
+  border:2px solid var(--border);border-radius:var(--r-xl);padding:28px 24px 24px;
+  text-align:center;background:var(--surface);cursor:pointer;transition:border-color 120ms,box-shadow 120ms,transform 100ms;
+  font-family:var(--font);width:100%;box-shadow:var(--sh)
+}
+.rol-card:hover{border-color:var(--brand);box-shadow:var(--sh-md);transform:translateY(-2px)}
+.rol-card:active{transform:translateY(0)}
+.rol-card .rol-icon{font-size:40px;margin-bottom:14px;display:block;line-height:1}
+.rol-card .rol-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+.rol-card .rol-desc{font-size:13px;color:var(--muted);line-height:1.55}
+.rol-card .rol-cta{
+  display:inline-flex;align-items:center;gap:6px;margin-top:18px;
+  padding:9px 20px;border-radius:var(--r);background:var(--brand-50);
+  border:1px solid var(--brand-light);color:var(--brand);font-size:14px;font-weight:500
+}
+.rol-card:hover .rol-cta{background:var(--brand);color:#fff;border-color:var(--brand)}
+.rol-note{text-align:center;margin-top:20px;font-size:12px;color:var(--muted)}
+.landing-wrap{padding:0 0 40px}
+.hero-section{
+  background:linear-gradient(160deg,var(--brand) 0%,var(--brand-mid) 100%);
+  color:#fff;padding:44px 20px 48px;text-align:center
+}
+@media(min-width:600px){.hero-section{padding:60px 40px 64px}}
+.hero-badge{
+  display:inline-flex;align-items:center;background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.3);border-radius:99px;
+  padding:4px 12px;font-size:12px;font-family:var(--mono);font-weight:500;
+  letter-spacing:.05em;margin-bottom:20px
+}
+.hero-title{font-size:30px;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:14px;line-height:1.2}
+@media(min-width:600px){.hero-title{font-size:40px}}
+.hero-sub{font-size:16px;color:rgba(255,255,255,.82);max-width:46ch;margin:0 auto 28px;line-height:1.6}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#fff;color:var(--brand);border:none;
+  padding:16px 32px;border-radius:var(--r);font-size:17px;font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);transition:transform 100ms,box-shadow 100ms;
+  cursor:pointer;font-family:var(--font);min-height:56px
+}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.24)}
+.hero-cta:active{transform:translateY(0);box-shadow:0 2px 8px rgba(0,0,0,.16)}
+.hero-legal{font-size:12px;color:rgba(255,255,255,.55);margin-top:14px}
+
+.features-section{padding:32px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.features-grid{display:grid;grid-template-columns:1fr;gap:0;max-width:700px;margin:0 auto}
+@media(min-width:600px){.features-grid{grid-template-columns:repeat(3,1fr)}}
+.feature-item{
+  display:flex;align-items:flex-start;gap:12px;padding:16px 0;
+  border-bottom:1px solid var(--border)
+}
+@media(min-width:600px){
+  .feature-item{flex-direction:column;align-items:center;text-align:center;padding:20px;border-bottom:none;border-right:1px solid var(--border)}
+  .feature-item:last-child{border-right:none}
+}
+.feature-icon{
+  width:40px;height:40px;background:var(--brand-light);border-radius:10px;
+  display:grid;place-items:center;color:var(--brand-mid);font-size:18px;flex-shrink:0
+}
+.feature-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.feature-desc{font-size:13px;color:var(--muted);line-height:1.5}
+
+.landing-extra{padding:28px 20px 0;max-width:700px;margin:0 auto}
+
+/* ================================================================
+   WIZARD SCREEN
+   ================================================================ */
+.wizard-layout{display:grid;grid-template-columns:1fr;gap:0;min-height:calc(100vh - 65px)}
+@media(min-width:960px){.wizard-layout{grid-template-columns:1fr 280px;align-items:start}}
+.wizard-main{padding:24px 20px}
+@media(min-width:600px){.wizard-main{padding:32px 28px}}
+.wizard-aside{display:none}
+@media(min-width:960px){.wizard-aside{display:block;padding:24px 20px 24px 0;position:sticky;top:81px}}
+
+/* Progress bar */
+.progress-bar{
+  display:flex;align-items:center;gap:0;margin-bottom:28px;
+  overflow-x:auto;padding-bottom:2px
+}
+.step-pill{
+  flex:1;min-width:52px;text-align:center;padding:8px 4px;font-size:11px;
+  color:var(--muted);font-family:var(--mono);border-bottom:3px solid var(--border);
+  cursor:pointer;transition:color 120ms,border-color 120ms;user-select:none;white-space:nowrap
+}
+.step-pill.done{color:var(--brand-mid);border-bottom-color:var(--brand-mid)}
+.step-pill.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
+.step-num{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
+
+/* Step card */
+.step-card{margin-bottom:0}
+.step-header{margin-bottom:24px}
+.step-header h2{font-size:22px;color:var(--text);margin-bottom:6px}
+.step-header p{font-size:14px;color:var(--muted)}
+
+/* Wizard nav */
+.wizard-nav{
+  display:flex;justify-content:space-between;gap:12px;padding:20px;
+  background:var(--surface);border-top:1px solid var(--border);
+  position:sticky;bottom:0;z-index:50;flex-wrap:wrap
+}
+.wizard-nav .nav-left{display:flex;gap:10px;align-items:center}
+.wizard-nav .nav-right{display:flex;gap:10px;align-items:center;margin-left:auto}
+
+/* Live preview box */
+.live-preview{
+  background:var(--brand-50);border:1px solid var(--brand-light);border-radius:var(--r);
+  padding:14px 16px;margin-top:4px
+}
+.live-preview .lp-label{font-size:11px;color:var(--brand-mid);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px}
+.live-preview .lp-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--t2)}
+.live-preview .lp-val{font-family:var(--mono);font-weight:500;color:var(--brand)}
+
+/* ================================================================
+   RESULTS SCREEN
+   ================================================================ */
+.resultado-wrap{padding:24px 20px 48px;max-width:860px;margin:0 auto}
+@media(min-width:600px){.resultado-wrap{padding:32px 28px 64px}}
+
+/* Total hero tile */
+.total-tile{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);
+  color:#fff;border-radius:var(--r-xl);padding:28px 24px 32px;
+  text-align:center;position:relative;overflow:hidden;box-shadow:var(--sh-lg)
+}
+.total-tile::after{
+  content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;
+  background:rgba(255,255,255,.06);border-radius:50%
+}
+.total-label{font-size:12px;text-transform:uppercase;letter-spacing:.1em;opacity:.75;font-weight:500;margin-bottom:8px;font-family:var(--mono)}
+.total-amount{font-family:var(--mono);font-size:36px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
+@media(min-width:480px){.total-amount{font-size:44px}}
+.total-meta{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;font-size:13px;opacity:.80}
+.total-meta span{display:flex;align-items:center;gap:4px}
+
+/* Summary tiles */
+.tiles-row{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:480px){.tiles-row{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:768px){.tiles-row{grid-template-columns:repeat(3,1fr)}}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--sh)}
+.tile-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500;margin-bottom:4px}
+.tile-val{font-family:var(--mono);font-size:19px;font-weight:500;color:var(--text)}
+.tile-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* Breakdown accordion */
+.breakdown-list{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--sh)}
+.bd-row{border-bottom:1px solid var(--border)}
+.bd-row:last-child{border-bottom:none}
+.bd-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px;cursor:pointer;gap:12px;
+  transition:background 100ms;min-height:52px
+}
+.bd-header:hover{background:var(--s2)}
+.bd-name{font-size:14px;font-weight:500;flex:1}
+.bd-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.bd-val{font-family:var(--mono);font-size:15px;font-weight:500}
+.bd-toggle{color:var(--muted);font-size:12px;transition:transform 200ms;font-family:var(--mono)}
+.bd-row.open .bd-toggle{transform:rotate(90deg)}
+.bd-detail{
+  display:none;padding:0 16px 14px;border-top:1px dashed var(--border);
+  font-size:13px;color:var(--t2);background:var(--s2)
+}
+.bd-row.open .bd-detail{display:block}
+.bd-formula{font-family:var(--mono);font-size:12px;color:var(--muted);margin:8px 0 4px}
+.bd-ref{font-family:var(--mono);font-size:11px;color:var(--brand);background:var(--brand-50);padding:2px 7px;border-radius:4px;display:inline-block;margin-top:6px}
+.bd-nota{font-size:12px;color:var(--amber);margin-top:6px;font-style:italic}
+.bd-na{opacity:.4;font-style:italic}
+
+/* Empresa comparison */
+.empresa-section{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--sh)}
+.empresa-trigger{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px 18px;cursor:pointer;background:var(--s2);
+  font-size:15px;font-weight:500;transition:background 100ms;min-height:56px
+}
+.empresa-trigger:hover{background:#f0ede8}
+.empresa-body{display:none;padding:20px 18px;border-top:1px solid var(--border)}
+.empresa-body.visible{display:block}
+.empresa-fields{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:480px){.empresa-fields{grid-template-columns:repeat(2,1fr)}}
+.empresa-total{background:var(--s2);border-radius:var(--r);padding:14px 16px;text-align:center;margin-top:16px}
+
+/* icon btn */
+.icon-btn{
+  background:transparent;border:1px solid var(--border);border-radius:5px;
+  width:32px;height:32px;display:grid;place-items:center;cursor:pointer;
+  color:var(--muted);font-size:16px;line-height:1;transition:color 80ms,border-color 80ms
+}
+.icon-btn:hover{color:var(--red);border-color:var(--red)}
+
+/* flash error */
+#flash-error{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:var(--red);color:#fff;padding:11px 18px;border-radius:var(--r);
+  font-size:14px;z-index:1000;box-shadow:var(--sh-md);display:none;
+  max-width:calc(100vw - 40px);text-align:center
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <noscript>
+    <div style="padding:40px 24px;text-align:center;font-family:-apple-system,Arial,sans-serif;max-width:480px;margin:0 auto;">
+      <div style="font-size:40px;margin-bottom:16px;">⚠️</div>
+      <h2 style="margin-bottom:12px;color:#0c3a5e;">Liquia requiere JavaScript</h2>
+      <p style="color:#6b7280;line-height:1.6;">Por favor habilite JavaScript en su navegador para usar la calculadora de liquidación laboral.</p>
+    </div>
+  </noscript>
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div class="brand-name">
+        <span class="brand-title">Liquia</span>
+        <span class="brand-sub">Liquidación Laboral Colombia</span>
+      </div>
+    </div>
+    <div class="header-norm" id="header-date"></div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+    <section id="screen-landing"  class="screen"></section>
+    <section id="screen-rol"      class="screen"></section>
+    <section id="screen-wizard"   class="screen"></section>
+    <section id="screen-resultado" class="screen"></section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <!-- Ad Slot 6: Footer Banner -->
+    <div class="ad-slot ad-slot-sm ad-slot-banner" id="ad-footer" style="max-width:728px;margin:0 auto 16px;" aria-label="Espacio publicitario">
+      <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">728×90 · 320×50</span></div>
+    </div>
+    <div><strong>Liquia</strong> · Calculadora de Liquidación Laboral en Colombia · Cálculo basado en <strong>CST · Ley 2466/2025 · Decreto 0159/2026</strong>.</div>
+    <div style="margin-top:4px;">
+      <strong>Liquia</strong> <strong>NO constituye asesoría jurídica</strong>. Es de uso informativo. Consulte un especialista laboral para casos complejos.
+    </div>
+  </footer>
+</div>
+<div id="flash-error" role="alert"></div>
+
+<!-- ============================================================
+     CONSTANTS
+     ============================================================ -->
+<script id="cst-js">
+  const SMMLV_2026        = 1750905;
+  const AUX_TRANSPORTE_2026 = 249095;
+  const TOPE_AUX_TRANSPORTE = 2 * SMMLV_2026;
+  const SALARIO_INTEGRAL_MIN = 13 * SMMLV_2026;
+  const TASA_INTERES_CESANTIAS = 0.12;
+  const HOY = new Date();
+  const NORMA_REF = "CST + Ley 2466/2025 + Decreto 0159/2026"; // referencia normativa interna
+</script>
+
+<!-- ============================================================
+     SECURITY HELPERS
+     ============================================================ -->
+<script id="sec-js">
+  // Escapa caracteres HTML para prevenir XSS al inyectar texto de usuario en innerHTML
+  function escHtml(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+  // Sanitiza un valor numérico: solo dígitos, punto y signo negativo
+  function sanitizeNum(val) {
+    const n = Number(String(val).replace(/[^0-9.\-]/g, ""));
+    return isNaN(n) ? 0 : n;
+  }
+</script>
+
+<!-- ============================================================
+     UTILS
+     ============================================================ -->
+<script id="util-js">
+  const fmtCOP = (n) => {
+    if (n === null || n === undefined || isNaN(n)) return "—";
+    const sign = n < 0 ? "-" : "";
+    return sign + "$" + Math.round(Math.abs(n)).toLocaleString("es-CO");
+  };
+  const fmtDate = (d) => {
+    if (!d) return "—";
+    const dt = (d instanceof Date) ? d : new Date(d + "T00:00:00");
+    return isNaN(dt) ? "—" : dt.toLocaleDateString("es-CO", {day:"2-digit",month:"short",year:"numeric"});
+  };
+  const parseDate = (s) => {
+    if (!s) return null;
+    const dt = new Date(s + "T00:00:00");
+    return isNaN(dt) ? null : dt;
+  };
+  function diasComerciales(fi, ff) {
+    const d1 = (fi instanceof Date) ? fi : parseDate(fi);
+    const d2 = (ff instanceof Date) ? ff : parseDate(ff);
+    if (!d1 || !d2) return 0;
+    let y1=d1.getFullYear(), m1=d1.getMonth()+1, day1=d1.getDate();
+    let y2=d2.getFullYear(), m2=d2.getMonth()+1, day2=d2.getDate();
+    if (day1===31) day1=30;
+    if (day2===31) day2=30;
+    return (y2-y1)*360 + (m2-m1)*30 + (day2-day1) + 1;
+  }
+  function diasCalendario(fi, ff) {
+    const d1 = (fi instanceof Date) ? fi : parseDate(fi);
+    const d2 = (ff instanceof Date) ? ff : parseDate(ff);
+    if (!d1 || !d2) return 0;
+    return Math.round((d2-d1)/86400000) + 1;
+  }
+  function inicioSemestreActual(ff) {
+    const d = (ff instanceof Date) ? ff : parseDate(ff);
+    if (!d) return null;
+    return d.getMonth() < 6 ? new Date(d.getFullYear(),0,1) : new Date(d.getFullYear(),6,1);
+  }
+  function inicioAnioActual(ff) {
+    const d = (ff instanceof Date) ? ff : parseDate(ff);
+    return d ? new Date(d.getFullYear(),0,1) : null;
+  }
+  function aniosYDias(dc) {
+    return { anios: Math.floor(dc/360), diasFraccion: dc - Math.floor(dc/360)*360 };
+  }
+  function uid() {
+    return "LQ-" + Math.random().toString(36).slice(2,8).toUpperCase() + "-" + Date.now().toString(36).slice(-4).toUpperCase();
+  }
+  const todayStr = () => HOY.toISOString().slice(0,10);
+  function tiempoHumano(dc) {
+    const a = Math.floor(dc/360), d = dc - a*360, m = Math.floor(d/30), ds = d - m*30;
+    let out = [];
+    if (a>0) out.push(a+"a");
+    if (m>0) out.push(m+"m");
+    if (ds>0 && a===0) out.push(ds+"d");
+    return out.join(" ") || "0d";
+  }
+</script>
+
+<!-- ============================================================
+     STATE
+     ============================================================ -->
+<script id="state-js">
+  const SK = "liquia_v1";
+  const defState = () => ({
+    step: 1,
+    screen: "landing",
+    rol: null,           // "trabajador" | "empresa"
+    datos: {
+      tipoContrato: "indefinido",
+      fechaIngreso: "",
+      fechaTerminacion: "",
+      motivoTerminacion: "despido_sin_justa",
+      tipoSalario: "fijo",
+      salarioFijo: "",
+      modoVariable: "promedio",
+      promedioVariable: "",
+      mensualidades: Array(12).fill(""),
+      salarioIntegral: "",
+      auxTransporteModo: "auto",
+      modalidadLaboral: "presencial",
+      conceptos: [],
+      diasVacacionesDisfrutadas: "0",
+      diasVacacionesPendientesAnt: "0",
+      cesantiasAnterioresConsignadas: "si",
+      cesantiasPendientesAnt: "0",
+      primaPagada: "si",
+      primaPendiente: "0",
+      diasSalariosPendientes: "0",
+      extrasComisionesPend: "0",
+      fueroEspecial: false,
+      periodoPrueba: false,
+      empresaConceptos: { cesantias:"", intereses:"", prima:"", vacaciones:"", indemnizacion:"", salarios:"", otros:"" }
+    }
+  });
+  let S = (() => {
+    try {
+      const raw = localStorage.getItem(SK);
+      if (!raw) return defState();
+      const p = JSON.parse(raw);
+      const b = defState();
+      return {...b,...p, datos:{...b.datos,...(p.datos||{}), empresaConceptos:{...b.datos.empresaConceptos,...(p.datos?.empresaConceptos||{})}}};
+    } catch { return defState(); }
+  })();
+  function save() { try { localStorage.setItem(SK, JSON.stringify(S)); } catch {} }
+  function reset() { S = defState(); save(); }
+</script>
+
+<!-- ============================================================
+     CALCULATION ENGINE  (all v1.1 fixes applied)
+     ============================================================ -->
+<script id="calc-js">
+  function aplicaAuxilio(d, baseSinAux) {
+    if (d.tipoSalario==="integral") return false;
+    if (d.auxTransporteModo==="si") return true;
+    if (d.auxTransporteModo==="no") return false;
+    return baseSinAux <= TOPE_AUX_TRANSPORTE;
+  }
+  function labelAux(d) { return d.modalidadLaboral==="teletrabajo" ? "Auxilio de conectividad" : "Auxilio de transporte"; }
+  function refAux(d)   { return d.modalidadLaboral==="teletrabajo" ? "Ley 2466/2025 · Art. 7 Ley 1/1963" : "Ley 15/1959 · Art. 7 Ley 1/1963"; }
+
+  function salBase(d) {
+    let sm = 0;
+    if (d.tipoSalario==="fijo") sm = Number(d.salarioFijo)||0;
+    else if (d.tipoSalario==="variable") {
+      if (d.modoVariable==="promedio") sm = Number(d.promedioVariable)||0;
+      else {
+        const filled = (d.mensualidades||[]).filter(m => m!==""&&m!==null&&m!==undefined);
+        sm = filled.length ? filled.reduce((a,m)=>a+(Number(m)||0),0)/filled.length : 0;
+      }
+    } else { sm = Number(d.salarioIntegral)||0; }
+    const concSal = (d.conceptos||[]).filter(c=>c.salarial).reduce((s,c)=>s+(Number(c.monto)||0),0);
+    const baseSinAux = sm + concSal;
+    const aplica = aplicaAuxilio(d, baseSinAux);
+    const aux = aplica ? AUX_TRANSPORTE_2026 : 0;
+    return {
+      salMensual: sm, concSal, baseSinAux, aplica, tipoAux: labelAux(d), refAux: refAux(d),
+      auxMensual: aux, baseConAux: baseSinAux + aux,
+      baseVac: baseSinAux,
+      baseIntVac: d.tipoSalario==="integral" ? sm/1.30 : null
+    };
+  }
+
+  function calcCesantias(base, dias, tipo) {
+    if (tipo==="integral") return {v:0, aplica:false, nota:"No aplica en salario integral."};
+    return {v:(base*dias)/360, aplica:true};
+  }
+  function calcIntereses(ces, dias, tipo) {
+    if (tipo==="integral") return {v:0, aplica:false};
+    return {v:(ces*dias*TASA_INTERES_CESANTIAS)/360, aplica:true};
+  }
+  function calcPrima(base, diasSem, tipo) {
+    if (tipo==="integral") return {v:0, aplica:false, nota:"No aplica en salario integral."};
+    return {v:(base*diasSem)/360, aplica:true};
+  }
+  function calcVacaciones(salSinAux, dias, disf, pendAnt, tipo, baseIntVac) {
+    const base = tipo==="integral" ? baseIntVac : salSinAux;
+    const causados = (15*dias)/360;
+    const netos = causados - Number(disf||0) + Number(pendAnt||0);
+    return {v:(base/30)*Math.max(0,netos), aplica:true, causados, netos};
+  }
+  function calcIndem(d, salDiario, salMensConAux) {
+    const {motivoTerminacion:mot, tipoContrato:tc, fechaIngreso:fi, fechaTerminacion:ff, periodoPrueba:pp} = d;
+    if (pp) return {v:0, aplica:false, nota:"Periodo de prueba: sin indemnización (Art. 80 CST)."};
+    if (mot!=="despido_sin_justa") return {v:0, aplica:false, nota:"Solo aplica en despido sin justa causa (Art. 64 CST)."};
+    const dias = diasComerciales(fi, ff);
+    const {anios, diasFraccion} = aniosYDias(dias);
+    const frac = diasFraccion/360;
+    const alto = salMensConAux >= 10*SMMLV_2026;
+    if (tc==="indefinido") {
+      let nd;
+      if (anios<1) {
+        nd = alto ? Math.max(20, 20*(anios+frac)) : Math.max(30, 30*(anios+frac));
+      } else {
+        nd = alto ? 20+(15*(anios-1))+(15*frac) : 30+(20*(anios-1))+(20*frac);
+      }
+      return {v:salDiario*nd, aplica:true, dias:nd, regla:alto?"alto":"bajo"};
+    }
+    if (tc==="fijo") return {v:0, aplica:true, nota:"Contrato a término fijo: ingresa el monto correspondiente en la sección de empresa (Art. 64 CST)."};
+    if (tc==="obra") return {v:salDiario*15, aplica:true, nota:"Mínimo 15 días de salario (Art. 64 CST)."};
+    return {v:0, aplica:false};
+  }
+
+  function calcularLiquidacion(d) {
+    const f1 = parseDate(d.fechaIngreso), f2 = parseDate(d.fechaTerminacion);
+    if (!f1||!f2) return {errors:["Ingresa fechas de ingreso y terminación válidas."]};
+    if (f2<f1) return {errors:["La fecha de terminación debe ser posterior a la de ingreso."]};
+    const dias = diasComerciales(f1, f2);
+    const diasCal = diasCalendario(f1, f2);
+    const base = salBase(d);
+    // Prima: días del semestre actual
+    const iniSem = inicioSemestreActual(f2);
+    const refSem = f1>iniSem ? f1 : iniSem;
+    const diasSem = diasComerciales(refSem, f2);
+    // Cesantías: si consignadas o parcial → solo año actual
+    let diasCes = dias;
+    const cesAnt = d.cesantiasAnterioresConsignadas;
+    if (cesAnt==="si"||cesAnt==="parcial") {
+      const iniAnio = inicioAnioActual(f2);
+      const refAnio = f1>iniAnio ? f1 : iniAnio;
+      diasCes = diasComerciales(refAnio, f2);
+    }
+    const bc = base.baseConAux;
+    const cesR = calcCesantias(bc, diasCes, d.tipoSalario);
+    const intR = calcIntereses(cesR.v, diasCes, d.tipoSalario);
+    const priR = calcPrima(bc, diasSem, d.tipoSalario);
+    const primPend = Number(d.primaPendiente||0);
+    const vacR = calcVacaciones(base.baseVac, dias, d.diasVacacionesDisfrutadas, d.diasVacacionesPendientesAnt, d.tipoSalario, base.baseIntVac);
+    const salDiario = bc/30;
+    const indemR = calcIndem(d, salDiario, bc);
+    const diasSalPend = Number(d.diasSalariosPendientes||0);
+    const salPend = salDiario * diasSalPend;
+    const extras = Number(d.extrasComisionesPend||0);
+    const cesPendAnt = Number(d.cesantiasPendientesAnt||0);
+    const lineas = [
+      { key:"cesantias",  aplica:cesR.aplica, concepto:"Cesantías",
+        formula:"(Base × Días) / 360", vars:`Base: ${fmtCOP(bc)} · Días: ${diasCes}`,
+        nota: base.aplica ? `Incluye ${base.tipoAux} en base (${base.refAux})` : undefined,
+        ref:"Art. 249 CST · Ley 50/1990", v:cesR.v },
+    ];
+    if (cesPendAnt>0 && cesAnt==="parcial") lineas.push(
+      { key:"cesantias_ant", aplica:true, concepto:"Cesantías pendientes años anteriores",
+        formula:"Valor capturado", vars:"Saldo no consignado en fondo",
+        ref:"Art. 249 CST", v:cesPendAnt }
+    );
+    lineas.push(
+      { key:"intereses", aplica:intR.aplica, concepto:"Intereses sobre cesantías",
+        formula:"(Cesantías × Días × 12%) / 360",
+        vars:`Ces: ${fmtCOP(cesR.v)} · Días: ${diasCes} · 12% anual`,
+        ref:"Ley 52/1975 · Art. 1", v:intR.v },
+      { key:"prima", aplica:priR.aplica, concepto:"Prima de servicios (semestre actual)",
+        formula:"(Base × Días semestre) / 360",
+        vars:`Base: ${fmtCOP(bc)} · Días semestre: ${diasSem}`,
+        nota:priR.nota, ref:"Art. 306 CST · Ley 1788/2016", v:priR.v }
+    );
+    if (primPend>0) lineas.push(
+      { key:"prima_ant", aplica:true, concepto:"Prima pendiente semestre anterior",
+        formula:"Valor capturado", vars:"Saldo prima semestre anterior",
+        ref:"Art. 306 CST", v:primPend }
+    );
+    lineas.push(
+      { key:"vacaciones", aplica:vacR.aplica, concepto:"Vacaciones compensadas",
+        formula:"(Salario/30) × Días netos",
+        vars:`Base vac: ${fmtCOP(d.tipoSalario==="integral"?base.baseIntVac:base.baseVac)} · Causados: ${vacR.causados.toFixed(2)} · Disfrutados: ${d.diasVacacionesDisfrutadas||0} · Pend. ant.: ${d.diasVacacionesPendientesAnt||0} · Netos: ${vacR.netos.toFixed(2)}`,
+        ref:"Art. 186 y 189 CST", v:vacR.v },
+      { key:"indemnizacion", aplica:indemR.aplica, concepto:"Indemnización por terminación",
+        formula: indemR.regla==="bajo" ? "Sal. diario × [30 + 20×(años-1) + 20×fracc.]" :
+                 indemR.regla==="alto" ? "Sal. diario × [20 + 15×(años-1) + 15×fracc.]" :
+                 indemR.aplica ? "Según tipo de contrato" : "No aplica",
+        vars: indemR.aplica ? `Sal. diario: ${fmtCOP(salDiario)} · Días indem.: ${indemR.dias?.toFixed(2)||"n/a"}` : (indemR.nota||"—"),
+        nota:indemR.nota, ref:"Art. 64 CST", v:indemR.v||0 }
+    );
+    if (diasSalPend>0) lineas.push(
+      { key:"salarios_pend", aplica:true, concepto:"Salarios pendientes último período",
+        formula:"Sal. diario × Días no pagados",
+        vars:`Sal. diario: ${fmtCOP(salDiario)} · Días: ${diasSalPend}`,
+        ref:"Art. 127 CST", v:salPend }
+    );
+    if (extras>0) lineas.push(
+      { key:"extras", aplica:true, concepto:"Horas extra / recargos / comisiones pendientes",
+        formula:"Valor declarado", vars:"Monto ingresado por el usuario",
+        ref:"Art. 168 y 179 CST", v:extras }
+    );
+    const total = lineas.reduce((s,l)=>s+(l.aplica?l.v:0),0);
+    return { errors:[], dias, diasCal, diasSem, diasCes, base, salDiario, lineas, total };
+  }
+</script>
+
+<!-- ============================================================
+     ALERTS
+     ============================================================ -->
+<script id="alerts-js">
+  function generarAlertas(d, calc) {
+    const al = [];
+    if (!calc || calc.errors?.length) return al;
+    const emp = d.empresaConceptos;
+    const tEmp = Object.values(emp||{}).reduce((s,v)=>s+(Number(v)||0),0);
+    const tEmpOk = tEmp>0;
+
+    if (d.motivoTerminacion==="despido_sin_justa" && tEmpOk && !(Number(emp.indemnizacion)>0) && !d.periodoPrueba)
+      al.push({sev:"critical", tag:"Indemnización ausente", txt:"Despido sin justa causa sin indemnización en la propuesta de la empresa. Art. 64 CST establece una indemnización mínima obligatoria."});
+    if (d.periodoPrueba)
+      al.push({sev:"info", tag:"Periodo de prueba", txt:"Terminación en periodo de prueba (máx. 2 meses): no genera indemnización por despido (Art. 80 CST)."});
+    if (d.fueroEspecial)
+      al.push({sev:"critical", tag:"Fuero o estabilidad reforzada", txt:"El trabajador podría tener fuero (embarazo, lactancia, sindical, salud). La terminación puede requerir autorización previa del Ministerio de Trabajo. Consulte asesoría profesional antes de actuar."});
+    const sumaSal = (d.conceptos||[]).filter(c=>c.salarial).reduce((s,c)=>s+(Number(c.monto)||0),0);
+    const sumaNoSal = (d.conceptos||[]).filter(c=>!c.salarial).reduce((s,c)=>s+(Number(c.monto)||0),0);
+    const totalPagos = (Number(d.tipoSalario==="fijo"?d.salarioFijo:d.tipoSalario==="integral"?d.salarioIntegral:d.promedioVariable)||0) + sumaSal + sumaNoSal;
+    if (totalPagos>0 && sumaNoSal/totalPagos>0.40)
+      al.push({sev:"warn", tag:"Art. 128 CST", txt:`Los pagos NO salariales representan el ${((sumaNoSal/totalPagos)*100).toFixed(1)}% del total. Si superan el 40%, hay riesgo de reclasificación jurisprudencial como salario.`});
+    if (d.tipoSalario==="variable" && tEmpOk)
+      al.push({sev:"warn", tag:"Salario variable", txt:"Verifique que la empresa usó el promedio del último año completo (Art. 132 CST), no el último valor pagado."});
+    if (calc.base.aplica && tEmpOk) {
+      const vacEmp = Number(emp.vacaciones||0);
+      const vacNorma = calc.lineas.find(l=>l.key==="vacaciones")?.v||0;
+      if (vacEmp>0 && vacNorma>0) {
+        const r = vacEmp/vacNorma;
+        if (r>1.05 && r<1.20)
+          al.push({sev:"warn", tag:`${calc.base.tipoAux} en vacaciones`, txt:`Las vacaciones de la empresa son ${((r-1)*100).toFixed(1)}% superiores. El ${calc.base.tipoAux.toLowerCase()} NO se incluye en base de vacaciones (Art. 192 CST).`});
+      }
+      const cesEmp = Number(emp.cesantias||0);
+      const cesNorma = calc.lineas.find(l=>l.key==="cesantias")?.v||0;
+      if (cesEmp>0 && cesNorma>0) {
+        const ratioBase = calc.base.baseSinAux/calc.base.baseConAux;
+        const r2 = cesEmp/cesNorma;
+        if (r2>ratioBase*0.96 && r2<ratioBase*1.04)
+          al.push({sev:"warn", tag:`${calc.base.tipoAux} omitido en cesantías`, txt:`Las cesantías de la empresa sugieren que NO se incluyó el ${calc.base.tipoAux.toLowerCase()} en la base. Sí debe incluirse (Art. 7 Ley 1/1963).`});
+      }
+    }
+    if (d.tipoSalario==="integral") {
+      const si = Number(d.salarioIntegral||0);
+      if (si < SALARIO_INTEGRAL_MIN)
+        al.push({sev:"critical", tag:"Salario integral inválido", txt:`El salario integral (${fmtCOP(si)}) está por debajo del mínimo de 13 SMMLV (${fmtCOP(SALARIO_INTEGRAL_MIN)}). Revise la categoría salarial.`});
+    }
+    if (d.tipoContrato==="aprendizaje")
+      al.push({sev:"warn", tag:"Contrato aprendizaje SENA", txt:"Régimen especial (Ley 789/2002). El aprendiz recibe un apoyo de sostenimiento, no salario. Las prestaciones del CST ordinario no aplican igual. Los resultados pueden no corresponder; consulte un especialista."});
+    if (calc.base.aplica && d.modalidadLaboral==="teletrabajo")
+      al.push({sev:"info", tag:"Teletrabajo · Ley 2466/2025", txt:"Se aplica auxilio de conectividad en lugar del de transporte para teletrabajadores con salario ≤ 2 SMMLV. Monto e inclusión en prestaciones son equivalentes."});
+    if (d.modalidadLaboral==="hibrido")
+      al.push({sev:"info", tag:"Modalidad híbrida", txt:"La reglamentación del auxilio de conectividad para trabajo híbrido está en desarrollo. Verifique qué auxilio aplica según el pacto laboral y la dedicación presencial."});
+    // Prescripción
+    const f2 = parseDate(d.fechaTerminacion);
+    if (f2) {
+      const elapsed = diasCalendario(f2, HOY);
+      const TRES = 3*365;
+      if (elapsed > TRES)
+        al.push({sev:"critical", tag:"Posible prescripción", txt:`Han transcurrido ${Math.floor(elapsed/365)} años y ${Math.floor((elapsed%365)/30)} meses desde la terminación. Las acciones laborales prescriben a los 3 años (Art. 488 CST). Consulte asesoría jurídica urgentemente.`});
+      else if (elapsed > TRES-90)
+        al.push({sev:"critical", tag:"Prescripción próxima", txt:`Quedan aprox. ${Math.ceil((TRES-elapsed)/30)} mes(es) antes del vencimiento de las acciones laborales (Art. 488 CST). No demore en actuar.`});
+    }
+    return al;
+  }
+</script>
+
+<!-- ============================================================
+     RENDER
+     ============================================================ -->
+<script id="render-js">
+  // ---- Textos personalizados por rol ----
+  const ROL = {
+    trabajador: {
+      label: "Trabajador",
+      heroSub: "Verifica que tu liquidación sea exactamente lo que la ley te garantiza.",
+      ctaLabel: "Calcular lo que me corresponde →",
+      wizardTitle: "Cálculo de tu liquidación",
+      s1title: "Datos de tu contrato",
+      s1sub: "Ingresa los datos del contrato laboral que terminó.",
+      s2title: "Tu salario",
+      s2sub: "Define el salario y los pagos adicionales que recibías.",
+      s3title: "Tus vacaciones",
+      s3sub: "Días que tomaste y saldos pendientes de toda la relación laboral.",
+      s4title: "Tus cesantías y prima anteriores",
+      s4sub: "Evita el doble conteo de prestaciones que ya te pagaron.",
+      s5title: "Pagos pendientes al cierre",
+      s5sub: "Salarios y conceptos que no te pagaron en el último período.",
+      resTitle: "Lo que te corresponde según la ley",
+      resLead: "Liquidación según norma · Resultado para trabajador",
+      empPrompt: "¿Tienes la liquidación que te propuso tu empresa? Compara aquí",
+      pdfSubtitle: "Informe de Liquidación · Para trabajador",
+    },
+    empresa: {
+      label: "Empleador",
+      heroSub: "Reconstruye la liquidación de un trabajador correctamente antes de pagarla.",
+      ctaLabel: "Calcular la liquidación a pagar →",
+      wizardTitle: "Cálculo de liquidación laboral",
+      s1title: "Datos del contrato",
+      s1sub: "Ingresa los datos del contrato del trabajador a liquidar.",
+      s2title: "Salario del trabajador",
+      s2sub: "Define el salario base y conceptos adicionales del trabajador.",
+      s3title: "Vacaciones del trabajador",
+      s3sub: "Días disfrutados y saldos pendientes durante toda la relación.",
+      s4title: "Cesantías y prima anteriores",
+      s4sub: "Registra lo que ya fue consignado o pagado en períodos anteriores.",
+      s5title: "Pagos al cierre del contrato",
+      s5sub: "Salarios y conceptos variables pendientes del último período.",
+      resTitle: "Liquidación según la ley a pagar",
+      resLead: "Liquidación calculada · Para empleador",
+      empPrompt: "¿Quieres ingresar lo que ya propusiste pagar? Compara aquí",
+      pdfSubtitle: "Informe de Liquidación · Para empleador",
+    },
+  };
+  function t(key) { return (ROL[S.rol] || ROL.trabajador)[key]; }
+
+  // ---- Router ----
+  function goTo(screen) {
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    const el = document.getElementById("screen-"+screen);
+    if (el) { el.classList.add("active"); window.scrollTo({top:0,behavior:"smooth"}); }
+    S.screen = screen; save();
+  }
+  function boot() {
+    renderLanding();
+    renderRol();
+    renderWizard();
+    renderResultado();
+    if (S.screen==="resultado" && S.step>5) { goTo("resultado"); return; }
+    if (S.screen==="wizard" && S.step>=1 && S.step<=5) { goTo("wizard"); return; }
+    if (S.screen==="rol" && !S.rol) { goTo("rol"); return; }
+    goTo("landing");
+  }
+
+  // ---- Flash error ----
+  function flashErr(msg) {
+    const el = document.getElementById("flash-error");
+    if (!el) return;
+    el.textContent = msg; el.style.display = "";
+    clearTimeout(window._ft);
+    window._ft = setTimeout(()=>{ el.style.display="none"; }, 3200);
+  }
+
+  // ==============================================================
+  // SCREEN: LANDING
+  // ==============================================================
+  function renderLanding() {
+    const el = document.getElementById("screen-landing");
+    el.innerHTML = `
+    <div class="landing-wrap">
+      <!-- Ad Slot 1: Top Banner -->
+      <div class="ad-slot ad-slot-sm" id="ad-landing-top" style="max-width:728px;margin:0 auto 0;" aria-label="Espacio publicitario">
+        <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">728×90 · 320×50</span></div>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero-section">
+        <div style="max-width:580px;margin:0 auto;">
+          <div class="hero-badge">Liquia · Colombia · CST + Ley 2466/2025 · Decreto 0159/2026</div>
+          <h1 class="hero-title">Calcula tu liquidación laboral</h1>
+          <p class="hero-sub">Liquia hace el cálculo exacto según la ley colombiana. Gratuito, sin registro y en minutos.</p>
+          <button class="hero-cta" id="btn-start">Calcular ahora <span style="font-size:20px;">→</span></button>
+          <p class="hero-legal">⚠ Liquia no constituye asesoría jurídica · Solo fines informativos</p>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="features-section">
+        <div class="features-grid" style="max-width:680px;margin:0 auto;">
+          <div class="feature-item">
+            <div class="feature-icon">📋</div>
+            <div>
+              <div class="feature-title">Todos los conceptos</div>
+              <div class="feature-desc">Cesantías, prima, vacaciones, intereses e indemnización según la ley.</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">⚖️</div>
+            <div>
+              <div class="feature-title">Normativa 2026</div>
+              <div class="feature-desc">Incluye Ley 2466/2025 y SMMLV actualizado con Decreto 0159/2026.</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📄</div>
+            <div>
+              <div class="feature-title">Informe PDF</div>
+              <div class="feature-desc">Descarga un informe profesional con fórmulas y referencias legales.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ad Slot 2: Landing Mid Rectangle -->
+      <div class="landing-extra" style="text-align:center;">
+        <div class="ad-slot ad-slot-md" id="ad-landing-mid" style="max-width:336px;margin:0 auto 28px;" aria-label="Espacio publicitario">
+          <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">300×250</span></div>
+        </div>
+        <div class="disclaimer" style="max-width:600px;margin:0 auto;text-align:left;">
+          <strong>Aviso importante:</strong> Liquia es un motor de cálculo matemático con fines informativos. Los resultados son orientativos. La exactitud depende de los datos ingresados. Ante dudas o disputas, consulte a un abogado laboralista o al Ministerio de Trabajo.
+        </div>
+      </div>
+    </div>
+    `;
+    document.getElementById("btn-start").addEventListener("click", ()=>{ goTo("rol"); });
+  }
+
+  // ==============================================================
+  // SCREEN: ROL SELECTION
+  // ==============================================================
+  function renderRol() {
+    const el = document.getElementById("screen-rol");
+    el.innerHTML = `
+    <div class="rol-wrap">
+      <div class="rol-header">
+        <h2>¿Cuál es tu situación?</h2>
+        <p>Personalizamos los textos y mensajes de la herramienta según tu perfil. El cálculo es el mismo para ambos.</p>
+      </div>
+
+      <div class="rol-cards">
+        <button class="rol-card" data-rol="trabajador">
+          <span class="rol-icon">👷</span>
+          <div class="rol-title">Soy trabajador</div>
+          <div class="rol-desc">Quiero verificar si la liquidación que me corresponde es correcta según la ley colombiana.</div>
+          <span class="rol-cta">Empezar como trabajador →</span>
+        </button>
+
+        <button class="rol-card" data-rol="empresa">
+          <span class="rol-icon">🏢</span>
+          <div class="rol-title">Soy empleador</div>
+          <div class="rol-desc">Quiero calcular la liquidación que debo pagar a un trabajador correctamente y sin errores.</div>
+          <span class="rol-cta">Empezar como empleador →</span>
+        </button>
+      </div>
+
+      <p class="rol-note">Puedes cambiar de perfil en cualquier momento volviendo a esta pantalla.</p>
+    </div>
+    `;
+    el.querySelectorAll("[data-rol]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        S.rol = btn.dataset.rol;
+        S.step = 1;
+        save();
+        renderWizard();
+        renderResultado();
+        goTo("wizard");
+      });
+    });
+  }
+
+  // ==============================================================
+  // SCREEN: WIZARD (5 steps)
+  // ==============================================================
+  const STEPS = ["Contrato","Salario","Vacaciones","Cesantías y prima","Pagos finales"];
+
+  function renderWizard() {
+    const el = document.getElementById("screen-wizard");
+    const rolLabel = S.rol ? `<span class="pill">${t("label")}</span>` : "";
+    el.innerHTML = `
+    <div class="wizard-layout">
+      <div class="wizard-main">
+        <!-- Progress -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+          ${rolLabel}
+          <h2 style="font-size:18px;font-weight:600;">${t("wizardTitle")}</h2>
+        </div>
+        <div class="progress-bar" role="tablist">
+          ${STEPS.map((lb,i)=>{
+            const n=i+1, cls=n===S.step?"active":(n<S.step?"done":"");
+            return `<div class="step-pill ${cls}" data-s="${n}" role="tab" aria-selected="${n===S.step}">
+              <span class="step-num">${n<S.step?"✓":n}</span>${lb}
+            </div>`;
+          }).join("")}
+        </div>
+        <!-- Step card -->
+        <div class="card">
+          <div class="card-body">${renderStep()}</div>
+        </div>
+      </div>
+
+      <!-- Desktop ad sidebar -->
+      <div class="wizard-aside">
+        <div class="ad-slot ad-slot-rect" id="ad-wizard-side" aria-label="Espacio publicitario" style="min-height:400px;">
+          <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">300×600</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky nav -->
+    <div class="wizard-nav">
+      <div class="nav-left">
+        ${S.step>1
+          ? `<button class="btn btn-ghost" id="btn-back">← Atrás</button>`
+          : `<button class="btn btn-ghost" id="btn-home">← Cambiar perfil</button>`
+        }
+      </div>
+      <div class="nav-right">
+        ${S.step<5
+          ? `<button class="btn btn-primary" id="btn-next">Continuar →</button>`
+          : `<button class="btn btn-primary" id="btn-calc">${t("ctaLabel").replace("→","✓")}</button>`
+        }
+      </div>
+    </div>
+    `;
+
+    // wire step pills
+    el.querySelectorAll("[data-s]").forEach(p=>{
+      p.addEventListener("click",()=>{
+        const n=Number(p.dataset.s);
+        if (n<=S.step+1) { collectStep(); S.step=n; save(); renderWizard(); }
+      });
+    });
+    const home = document.getElementById("btn-home");
+    if (home) home.addEventListener("click",()=>{ goTo("rol"); });
+    const back = document.getElementById("btn-back");
+    if (back) back.addEventListener("click",()=>{ collectStep(); S.step=Math.max(1,S.step-1); save(); renderWizard(); });
+    const next = document.getElementById("btn-next");
+    if (next) next.addEventListener("click",()=>{ if(collectStep()){S.step++;save();renderWizard();} });
+    const calc = document.getElementById("btn-calc");
+    if (calc) calc.addEventListener("click",()=>{ if(collectStep()){S.step=6;save();renderResultado();goTo("resultado");} });
+    wireStep();
+  }
+
+  function renderStep() {
+    switch(S.step){
+      case 1: return renderS1();
+      case 2: return renderS2();
+      case 3: return renderS3();
+      case 4: return renderS4();
+      case 5: return renderS5();
+      default: return "";
+    }
+  }
+
+  // ---- Step 1: Datos del contrato ----
+  function renderS1() {
+    const d = S.datos;
+    const dc = (d.fechaIngreso&&d.fechaTerminacion) ? diasComerciales(d.fechaIngreso,d.fechaTerminacion) : null;
+    const dcc = (d.fechaIngreso&&d.fechaTerminacion) ? diasCalendario(d.fechaIngreso,d.fechaTerminacion) : null;
+    return `
+    <div class="step-header">
+      <h2>${t("s1title")}</h2>
+      <p>${t("s1sub")}</p>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <div class="field-label">Tipo de contrato</div>
+        <select name="tipoContrato">
+          <option value="indefinido" ${d.tipoContrato==="indefinido"?"selected":""}>Término indefinido</option>
+          <option value="fijo"       ${d.tipoContrato==="fijo"?"selected":""}>Término fijo</option>
+          <option value="obra"       ${d.tipoContrato==="obra"?"selected":""}>Obra o labor</option>
+          <option value="aprendizaje"${d.tipoContrato==="aprendizaje"?"selected":""}>Aprendizaje SENA</option>
+          <option value="domestico"  ${d.tipoContrato==="domestico"?"selected":""}>Servicio doméstico</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="field-label">Motivo de terminación</div>
+        <select name="motivoTerminacion">
+          <option value="despido_sin_justa"${d.motivoTerminacion==="despido_sin_justa"?"selected":""}>Despido sin justa causa</option>
+          <option value="despido_con_justa"${d.motivoTerminacion==="despido_con_justa"?"selected":""}>Despido con justa causa</option>
+          <option value="renuncia"        ${d.motivoTerminacion==="renuncia"?"selected":""}>Renuncia voluntaria</option>
+          <option value="mutuo"           ${d.motivoTerminacion==="mutuo"?"selected":""}>Mutuo acuerdo</option>
+          <option value="vencimiento"     ${d.motivoTerminacion==="vencimiento"?"selected":""}>Vencimiento del término</option>
+          <option value="obra_terminada"  ${d.motivoTerminacion==="obra_terminada"?"selected":""}>Terminación de la obra</option>
+          <option value="muerte"          ${d.motivoTerminacion==="muerte"?"selected":""}>Muerte del trabajador</option>
+          <option value="abandono"        ${d.motivoTerminacion==="abandono"?"selected":""}>Abandono del cargo</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="field-label">Fecha de ingreso</div>
+        <input type="date" name="fechaIngreso" value="${d.fechaIngreso}" max="${todayStr()}" inputmode="none"/>
+        <span class="field-error" id="err-fecha">La fecha de terminación debe ser posterior a la de ingreso.</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Fecha de terminación</div>
+        <input type="date" name="fechaTerminacion" value="${d.fechaTerminacion}" inputmode="none"/>
+      </div>
+      <div class="full" id="time-preview" style="${dc?'':'display:none;'}">
+        <div class="live-preview">
+          <div class="lp-label">Tiempo de servicio calculado (año comercial 360/30)</div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <div><div class="lp-label">Días comerciales</div><div class="lp-val">${dc??''}</div></div>
+            <div><div class="lp-label">Días calendario</div><div class="lp-val">${dcc??''}</div></div>
+            <div><div class="lp-label">Aprox.</div><div class="lp-val">${dc?tiempoHumano(dc):''}</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="full">
+        <label class="checkbox-row">
+          <input type="checkbox" name="periodoPrueba" ${d.periodoPrueba?"checked":""}/>
+          Estaba en periodo de prueba (menos de 2 meses · Art. 76–80 CST)
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" name="fueroEspecial" ${d.fueroEspecial?"checked":""}/>
+          Aplica fuero o estabilidad reforzada (embarazo, lactancia, sindical, incapacidad)
+        </label>
+      </div>
+    </div>`;
+  }
+
+  // ---- Step 2: Salario ----
+  function renderS2() {
+    const d = S.datos;
+    const tipo=d.tipoSalario, mVar=d.modoVariable;
+    const meses=d.mensualidades||Array(12).fill("");
+    const concRows=(d.conceptos||[]).map((c,i)=>`
+      <div class="concept-row" data-idx="${i}">
+        <input class="concept-name" type="text" placeholder="Ej: Comisión, rodamiento…"
+          value="${escHtml(c.nombre||"")}" data-cf="nombre" maxlength="80"/>
+        <input class="concept-amount" type="number" inputmode="decimal" min="0"
+          placeholder="Monto mensual" value="${sanitizeNum(c.monto)||""}" data-cf="monto"/>
+        <button type="button" class="icon-btn" data-rm="${i}" title="Eliminar">×</button>
+        <label class="checkbox-row" style="grid-column:1/-1;padding:6px 0 0;font-size:13px;">
+          <input type="checkbox" data-cf="salarial" ${c.salarial?"checked":""}/>
+          Constituye salario (incluir en base de prestaciones)
+        </label>
+      </div>`).join("");
+    return `
+    <div class="step-header">
+      <h2>${t("s2title")}</h2>
+      <p>${t("s2sub")}</p>
+    </div>
+    <div class="stack gap-24">
+      <div class="form-grid">
+        <div class="field">
+          <div class="field-label">Tipo de salario</div>
+          <select name="tipoSalario">
+            <option value="fijo"     ${tipo==="fijo"?"selected":""}>Ordinario fijo</option>
+            <option value="variable" ${tipo==="variable"?"selected":""}>Ordinario variable</option>
+            <option value="integral" ${tipo==="integral"?"selected":""}>Integral (≥ 13 SMMLV)</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">Modalidad laboral</div>
+          <select name="modalidadLaboral">
+            <option value="presencial"  ${d.modalidadLaboral==="presencial"||!d.modalidadLaboral?"selected":""}>Presencial</option>
+            <option value="teletrabajo" ${d.modalidadLaboral==="teletrabajo"?"selected":""}>Teletrabajo (Ley 2466/2025)</option>
+            <option value="hibrido"     ${d.modalidadLaboral==="hibrido"?"selected":""}>Híbrido</option>
+          </select>
+          <span class="field-hint">Determina si aplica auxilio de transporte o de conectividad.</span>
+        </div>
+        <div class="field">
+          <div class="field-label">Auxilio (transporte / conectividad)</div>
+          <select name="auxTransporteModo">
+            <option value="auto" ${d.auxTransporteModo==="auto"?"selected":""}>Automático — aplica si salario ≤ 2 SMMLV</option>
+            <option value="si"   ${d.auxTransporteModo==="si"?"selected":""}>Sí aplica</option>
+            <option value="no"   ${d.auxTransporteModo==="no"?"selected":""}>No aplica</option>
+          </select>
+          <span class="field-hint">Valor 2026: ${fmtCOP(AUX_TRANSPORTE_2026)} · Incluido en base de cesantías y prima.</span>
+        </div>
+      </div>
+
+      ${tipo==="fijo" ? `
+      <div class="field">
+        <div class="field-label">Salario mensual</div>
+        <input type="number" inputmode="decimal" min="0" name="salarioFijo"
+          value="${d.salarioFijo||""}" placeholder="Ej: 2000000"/>
+        <span class="field-hint">SMMLV 2026: ${fmtCOP(SMMLV_2026)}</span>
+      </div>` : ""}
+
+      ${tipo==="variable" ? `
+      <div class="stack gap-16">
+        <div class="radio-group">
+          <label class="radio-btn"><input type="radio" name="modoVar" value="promedio" ${mVar==="promedio"?"checked":""}/>Ingresar promedio del año</label>
+          <label class="radio-btn"><input type="radio" name="modoVar" value="mensual"  ${mVar==="mensual"?"checked":""}/>Mes por mes (últimos 12)</label>
+        </div>
+        ${mVar==="promedio" ? `
+        <div class="field">
+          <div class="field-label">Promedio mensual del último año</div>
+          <input type="number" inputmode="decimal" min="0" name="promedioVariable" value="${d.promedioVariable||""}" placeholder="0"/>
+          <span class="field-hint">Art. 132 CST: se toma el promedio de los últimos 12 meses.</span>
+        </div>` : `
+        <div>
+          <div class="field-label" style="margin-bottom:10px;">Últimos 12 meses (M−12 a M−1) — incluye $0 si el mes tuvo cero ingresos</div>
+          <div class="month-grid">
+            ${meses.map((m,i)=>`
+            <div>
+              <div class="field-label">M−${12-i}</div>
+              <input type="number" inputmode="decimal" min="0" name="m${i}" value="${m||""}" placeholder="0"/>
+            </div>`).join("")}
+          </div>
+          <div id="prom-live" class="field-hint" style="margin-top:10px;"></div>
+        </div>`}
+      </div>` : ""}
+
+      ${tipo==="integral" ? `
+      <div class="field">
+        <div class="field-label">Salario integral mensual</div>
+        <input type="number" inputmode="decimal" min="0" name="salarioIntegral"
+          value="${d.salarioIntegral||""}" placeholder="0"/>
+        <span class="field-hint">Mínimo 13 SMMLV (${fmtCOP(SALARIO_INTEGRAL_MIN)}). Solo aplican vacaciones (base = integral / 1.30). No aplican cesantías, prima ni auxilio.</span>
+      </div>` : ""}
+
+      <div>
+        <div class="row-between" style="margin-bottom:10px;">
+          <div>
+            <div class="field-label">Otros conceptos (opcional)</div>
+            <div class="field-hint">Indica si constituyen salario para incluirlos en la base de prestaciones (Art. 128 CST).</div>
+          </div>
+          <button type="button" class="btn btn-sm" id="add-concepto">+ Agregar</button>
+        </div>
+        <div id="conceptos-list">
+          ${concRows || `<div class="text-muted text-sm" style="padding:8px 0;">Sin conceptos adicionales.</div>`}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- Step 3: Vacaciones ----
+  function renderS3() {
+    const d = S.datos;
+    const dc = (d.fechaIngreso&&d.fechaTerminacion) ? diasComerciales(d.fechaIngreso,d.fechaTerminacion) : 0;
+    const causados = (15*dc)/360;
+    const netos = causados - Number(d.diasVacacionesDisfrutadas||0) + Number(d.diasVacacionesPendientesAnt||0);
+    return `
+    <div class="step-header">
+      <h2>${t("s3title")}</h2>
+      <p>${t("s3sub")}</p>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <div class="field-label">Días de vacaciones disfrutados (toda la relación)</div>
+        <input type="number" inputmode="decimal" min="0" step="0.5" name="diasVacacionesDisfrutadas"
+          value="${d.diasVacacionesDisfrutadas||"0"}" placeholder="0"/>
+        <span class="field-hint">Días efectivamente tomados como vacaciones durante todo el contrato.</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Días pendientes de períodos anteriores</div>
+        <input type="number" inputmode="decimal" min="0" step="0.5" name="diasVacacionesPendientesAnt"
+          value="${d.diasVacacionesPendientesAnt||"0"}" placeholder="0"/>
+        <span class="field-hint">Vacaciones causadas en períodos anteriores no disfrutadas ni compensadas.</span>
+      </div>
+      <div class="full">
+        <div class="live-preview" id="vac-preview">
+          <div class="lp-label">Estimado de vacaciones a compensar</div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <div><div class="lp-label">Días causados</div><div class="lp-val">${causados.toFixed(2)}</div></div>
+            <div><div class="lp-label">Días a pagar (neto)</div><div class="lp-val" id="vac-netos">${Math.max(0,netos).toFixed(2)}</div></div>
+          </div>
+          <div class="field-hint" style="margin-top:6px;">Fórmula: 15 días × días trabajados / 360 (Art. 186 CST)</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- Step 4: Cesantías y prima ----
+  function renderS4() {
+    const d = S.datos;
+    const cesAnt = d.cesantiasAnterioresConsignadas;
+    return `
+    <div class="step-header">
+      <h2>${t("s4title")}</h2>
+      <p>${t("s4sub")}</p>
+    </div>
+    <div class="stack gap-24">
+      <div>
+        <div class="field-label" style="margin-bottom:10px;">¿Las cesantías de años anteriores están consignadas en el fondo?</div>
+        <div class="radio-group">
+          <label class="radio-btn"><input type="radio" name="cesAntCon" value="si"     ${cesAnt==="si"?"checked":""}/> Sí, todas</label>
+          <label class="radio-btn"><input type="radio" name="cesAntCon" value="no"     ${cesAnt==="no"?"checked":""}/> No</label>
+          <label class="radio-btn"><input type="radio" name="cesAntCon" value="parcial"${cesAnt==="parcial"?"checked":""}/> Parcialmente</label>
+        </div>
+        <div class="field-hint" style="margin-top:8px;">
+          ${cesAnt==="si"?"Se calculan cesantías solo por el año en curso.":
+            cesAnt==="parcial"?"Se calculan por el año actual. Añade el saldo pendiente abajo.":
+            "Se calculan las cesantías de todo el período (nunca fueron consignadas)."}
+        </div>
+        <div id="ces-pend-wrap" style="${cesAnt==="parcial"?"":"display:none;"};margin-top:14px;">
+          <div class="field">
+            <div class="field-label">Cesantías pendientes de años anteriores</div>
+            <input type="number" inputmode="decimal" min="0" name="cesantiasPendientesAnt"
+              value="${d.cesantiasPendientesAnt||"0"}" placeholder="0"/>
+            <span class="field-hint">Saldo que el fondo no tiene consignado de períodos anteriores.</span>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="field-label" style="margin-bottom:10px;">¿La prima del último semestre completo ya fue pagada?</div>
+        <div class="radio-group">
+          <label class="radio-btn"><input type="radio" name="primaPag" value="si" ${d.primaPagada==="si"?"checked":""}/> Sí</label>
+          <label class="radio-btn"><input type="radio" name="primaPag" value="no" ${d.primaPagada==="no"?"checked":""}/> No</label>
+        </div>
+        <div id="prima-pend-wrap" style="margin-top:14px;">
+          <div class="field">
+            <div class="field-label">Prima pendiente del semestre anterior (si aplica)</div>
+            <input type="number" inputmode="decimal" min="0" name="primaPendiente"
+              value="${d.primaPendiente||"0"}" placeholder="0"/>
+            <span class="field-hint">Solo si el semestre anterior no fue pagado completo.</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- Step 5: Pagos pendientes ----
+  function renderS5() {
+    const d = S.datos;
+    return `
+    <div class="step-header">
+      <h2>${t("s5title")}</h2>
+      <p>${t("s5sub")}</p>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <div class="field-label">Días del último mes trabajados y no pagados</div>
+        <input type="number" inputmode="decimal" min="0" step="1" name="diasSalPend"
+          value="${d.diasSalariosPendientes||"0"}" placeholder="0"/>
+        <span class="field-hint">Días entre el último corte de nómina y la fecha de terminación.</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Horas extra, recargos o comisiones pendientes</div>
+        <input type="number" inputmode="decimal" min="0" name="extrasPend"
+          value="${d.extrasComisionesPend||"0"}" placeholder="0"/>
+        <span class="field-hint">Suma total de conceptos variables del último período no liquidados.</span>
+      </div>
+    </div>
+    <div class="disclaimer mt-24">
+      <strong>Listo para calcular.</strong> Con los datos ingresados en los 5 pasos se generará el cálculo completo según la ley. Después podrás compararlo con la propuesta de la empresa si la tienes.
+    </div>`;
+  }
+
+  // ---- Wire step events ----
+  function wireStep() {
+    const s = S.step, d = S.datos;
+    function bind(sel, fn) {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      el.addEventListener("input", e=>{fn(e.target.value); save();});
+      el.addEventListener("change", e=>{fn(e.target.value); save();});
+    }
+    function bindCb(sel, fn) {
+      const el = document.querySelector(sel);
+      if (el) el.addEventListener("change", e=>{fn(e.target.checked); save();});
+    }
+    if (s===1) {
+      bind(`select[name="tipoContrato"]`, v=>d.tipoContrato=v);
+      bind(`select[name="motivoTerminacion"]`, v=>d.motivoTerminacion=v);
+      bind(`input[name="fechaIngreso"]`, v=>{ d.fechaIngreso=v; refreshDatePreview(); });
+      bind(`input[name="fechaTerminacion"]`, v=>{ d.fechaTerminacion=v; refreshDatePreview(); });
+      bindCb(`input[name="periodoPrueba"]`, v=>d.periodoPrueba=v);
+      bindCb(`input[name="fueroEspecial"]`, v=>d.fueroEspecial=v);
+    }
+    if (s===2) {
+      bind(`select[name="tipoSalario"]`, v=>{ d.tipoSalario=v; save(); renderWizard(); });
+      bind(`select[name="modalidadLaboral"]`, v=>d.modalidadLaboral=v);
+      bind(`select[name="auxTransporteModo"]`, v=>d.auxTransporteModo=v);
+      bind(`input[name="salarioFijo"]`, v=>d.salarioFijo=v);
+      bind(`input[name="promedioVariable"]`, v=>d.promedioVariable=v);
+      bind(`input[name="salarioIntegral"]`, v=>d.salarioIntegral=v);
+      document.querySelectorAll(`input[name="modoVar"]`).forEach(r=>r.addEventListener("change", e=>{d.modoVariable=e.target.value; save(); renderWizard();}));
+      for(let i=0;i<12;i++) bind(`input[name="m${i}"]`, v=>{ d.mensualidades[i]=v; refreshPromLive(); });
+      refreshPromLive();
+      const addBtn = document.getElementById("add-concepto");
+      if (addBtn) addBtn.addEventListener("click", ()=>{
+        d.conceptos.push({nombre:"",monto:"",salarial:true}); save(); renderWizard();
+      });
+      document.querySelectorAll("#conceptos-list .concept-row").forEach(row=>{
+        const i=Number(row.dataset.idx);
+        row.querySelector(`[data-cf="nombre"]`)?.addEventListener("input", e=>d.conceptos[i].nombre=e.target.value);
+        row.querySelector(`[data-cf="monto"]`)?.addEventListener("input", e=>d.conceptos[i].monto=e.target.value);
+        row.querySelector(`[data-cf="salarial"]`)?.addEventListener("change", e=>d.conceptos[i].salarial=e.target.checked);
+        row.querySelector(`[data-rm]`)?.addEventListener("click", ()=>{ d.conceptos.splice(i,1); save(); renderWizard(); });
+      });
+    }
+    if (s===3) {
+      bind(`input[name="diasVacacionesDisfrutadas"]`, v=>{ d.diasVacacionesDisfrutadas=v; refreshVacPreview(); });
+      bind(`input[name="diasVacacionesPendientesAnt"]`, v=>{ d.diasVacacionesPendientesAnt=v; refreshVacPreview(); });
+    }
+    if (s===4) {
+      document.querySelectorAll(`input[name="cesAntCon"]`).forEach(r=>r.addEventListener("change", e=>{
+        d.cesantiasAnterioresConsignadas=e.target.value; save(); renderWizard();
+      }));
+      document.querySelectorAll(`input[name="primaPag"]`).forEach(r=>r.addEventListener("change", e=>{ d.primaPagada=e.target.value; save(); }));
+      bind(`input[name="cesantiasPendientesAnt"]`, v=>d.cesantiasPendientesAnt=v);
+      bind(`input[name="primaPendiente"]`, v=>d.primaPendiente=v);
+    }
+    if (s===5) {
+      bind(`input[name="diasSalPend"]`, v=>d.diasSalariosPendientes=v);
+      bind(`input[name="extrasPend"]`, v=>d.extrasComisionesPend=v);
+    }
+  }
+
+  function refreshDatePreview() {
+    const d=S.datos;
+    const dc=(d.fechaIngreso&&d.fechaTerminacion)?diasComerciales(d.fechaIngreso,d.fechaTerminacion):null;
+    const dcc=(d.fechaIngreso&&d.fechaTerminacion)?diasCalendario(d.fechaIngreso,d.fechaTerminacion):null;
+    const wrap=document.getElementById("time-preview");
+    if (!wrap) return;
+    const errEl=document.getElementById("err-fecha");
+    const fi=parseDate(d.fechaIngreso), ff=parseDate(d.fechaTerminacion);
+    if (fi&&ff&&ff<fi){ if(errEl) errEl.classList.add("visible"); wrap.style.display="none"; return; }
+    if (errEl) errEl.classList.remove("visible");
+    if (dc && dc>0) {
+      wrap.style.display="";
+      wrap.querySelectorAll(".lp-val").forEach((el,i)=>{
+        if(i===0) el.textContent=dc;
+        else if(i===1) el.textContent=dcc;
+        else el.textContent=tiempoHumano(dc);
+      });
+    } else { wrap.style.display="none"; }
+  }
+  function refreshVacPreview() {
+    const d=S.datos;
+    const dc=(d.fechaIngreso&&d.fechaTerminacion)?diasComerciales(d.fechaIngreso,d.fechaTerminacion):0;
+    const causados=(15*dc)/360;
+    const netos=causados-Number(d.diasVacacionesDisfrutadas||0)+Number(d.diasVacacionesPendientesAnt||0);
+    const el=document.getElementById("vac-netos");
+    if(el) el.textContent=Math.max(0,netos).toFixed(2);
+  }
+  function refreshPromLive() {
+    const d=S.datos;
+    if(d.tipoSalario!=="variable"||d.modoVariable!=="mensual") return;
+    const el=document.getElementById("prom-live"); if(!el) return;
+    const filled=(d.mensualidades||[]).filter(m=>m!==""&&m!==null&&m!==undefined);
+    if(!filled.length){el.textContent=""; return;}
+    const prom=filled.reduce((a,m)=>a+(Number(m)||0),0)/filled.length;
+    el.textContent=`Promedio (${filled.length} meses): ${fmtCOP(prom)} — Art. 132 CST`;
+  }
+
+  function collectStep() {
+    const d=S.datos;
+    if (S.step===1) {
+      const fi=parseDate(d.fechaIngreso), ff=parseDate(d.fechaTerminacion);
+      if(!fi||!ff){flashErr("Ingresa las fechas de ingreso y terminación.");return false;}
+      if(ff<fi){flashErr("La fecha de terminación debe ser posterior a la de ingreso.");return false;}
+    }
+    if (S.step===2) {
+      const sal=(() => {
+        if(d.tipoSalario==="fijo") return Number(d.salarioFijo)||0;
+        if(d.tipoSalario==="variable") return Number(d.promedioVariable)||0;
+        return Number(d.salarioIntegral)||0;
+      })();
+      if(sal<=0){flashErr("Ingresa el valor del salario para continuar.");return false;}
+    }
+    save(); return true;
+  }
+
+  // ==============================================================
+  // SCREEN: RESULTADO
+  // ==============================================================
+  const EMP_MAP=[
+    {key:"cesantias",    normaKeys:["cesantias","cesantias_ant"], empF:"cesantias",    lbl:"Cesantías"},
+    {key:"intereses",    normaKeys:["intereses"],                 empF:"intereses",    lbl:"Intereses cesantías"},
+    {key:"prima",        normaKeys:["prima","prima_ant"],         empF:"prima",        lbl:"Prima de servicios"},
+    {key:"vacaciones",   normaKeys:["vacaciones"],                empF:"vacaciones",   lbl:"Vacaciones"},
+    {key:"indemnizacion",normaKeys:["indemnizacion"],             empF:"indemnizacion",lbl:"Indemnización"},
+    {key:"salarios",     normaKeys:["salarios_pend"],             empF:"salarios",     lbl:"Salarios pendientes"},
+    {key:"otros",        normaKeys:["extras"],                    empF:"otros",        lbl:"Horas extra / otros"},
+  ];
+
+  function renderResultado() {
+    const el=document.getElementById("screen-resultado");
+    const d=S.datos;
+    const calc=calcularLiquidacion(d);
+    if(calc.errors?.length){
+      el.innerHTML=`<div class="resultado-wrap"><div class="card"><div class="card-body">
+        <h2 style="margin-bottom:12px;">Datos incompletos</h2>
+        <p class="text-muted">${escHtml(calc.errors[0])}</p>
+        <button class="btn btn-primary mt-24" id="back-wiz">← Completar datos</button>
+      </div></div></div>`;
+      document.getElementById("back-wiz")?.addEventListener("click",()=>{ S.step=1; save(); renderWizard(); goTo("wizard"); });
+      return;
+    }
+    const alertas=generarAlertas(d,calc);
+    const tNorma=calc.total;
+    const tEmp=Object.values(d.empresaConceptos||{}).reduce((s,v)=>s+(Number(v)||0),0);
+    const tieneEmp=tEmp>0;
+    const diff=tEmp-tNorma;
+    const pctAbs=tNorma>0?Math.abs(diff/tNorma):0;
+    const infoId=window._iid||(window._iid=uid());
+    function band(r){
+      if(r<=.01) return {code:"t",mark:"≤1%",title:"Dentro de tolerancia",body:"Diferencia por debajo del 1%. Atribuible a redondeos."};
+      if(r<=.05) return {code:"p",mark:"1–5%",title:"Diferencia pequeña",body:"Entre 1% y 5%. Revisa los componentes antes de aceptar."};
+      if(r<=.15) return {code:"s",mark:"5–15%",title:"Diferencia significativa",body:"Entre 5% y 15%. Se recomienda revisión detallada de cada concepto."};
+      return {code:"a",mark:">15%",title:"Diferencia muy alta",body:"Supera el 15%. Revisa cuidadosamente antes de aceptar o pagar."};
+    }
+    const b=tieneEmp?band(pctAbs):null;
+    const compRows=EMP_MAP.map(m=>{
+      const norma=m.normaKeys.reduce((s,k)=>{const l=calc.lineas.find(x=>x.key===k);return s+(l&&l.aplica?l.v:0);},0);
+      const emp=Number(d.empresaConceptos[m.empF]||0);
+      const df=emp-norma;
+      const pct=norma>0?df/norma:(emp>0?1:0);
+      return {lbl:m.lbl,norma,emp,diff:df,pct,key:m.key};
+    });
+    el.innerHTML=`
+    <div class="resultado-wrap">
+      <!-- Disclaimer -->
+      <div class="disclaimer mb-24">
+        <strong>Liquia es informativa.</strong> No constituye asesoría jurídica. La exactitud depende de los datos ingresados. Ante dudas, consulte con un abogado laboralista o el Ministerio de Trabajo.
+      </div>
+
+      <!-- Ad Slot 4: Results Top Banner -->
+      <div class="ad-slot ad-slot-sm mb-24" id="ad-res-top" aria-label="Espacio publicitario">
+        <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">728×90 · 320×50</span></div>
+      </div>
+
+      <div class="row-between mb-24">
+        <div class="stack gap-4">
+          <div class="row gap-8">
+            ${S.rol?`<span class="pill">${t("label")}</span>`:''}
+            <span class="pill">Liquidación según la ley</span>
+            <span class="text-xs text-muted mono">${infoId}</span>
+          </div>
+          <h2 style="font-size:18px;">${t("resLead")} · ${fmtDate(HOY)}</h2>
+        </div>
+        <div class="row gap-8">
+          <button class="btn btn-ghost" id="btn-edit">← Editar</button>
+          <button class="btn btn-primary" id="btn-pdf">⬇ PDF</button>
+        </div>
+      </div>
+
+      <!-- Total hero -->
+      <div class="total-tile mb-24">
+        <div class="total-label">${t("resTitle")}</div>
+        <div class="total-amount">${fmtCOP(tNorma)}</div>
+        <div class="total-meta">
+          <span>📅 ${calc.dias} días comerciales</span>
+          <span>⏱ ${tiempoHumano(calc.dias)}</span>
+          <span>💰 Base: ${fmtCOP(calc.base.baseConAux)}</span>
+        </div>
+      </div>
+
+      <!-- Summary tiles -->
+      <div class="tiles-row mb-24">
+        <div class="tile">
+          <div class="tile-lbl">Salario mensual base</div>
+          <div class="tile-val">${fmtCOP(calc.base.baseSinAux)}</div>
+          <div class="tile-sub">${calc.base.aplica?calc.base.tipoAux+" incluido":"Sin auxilio"}</div>
+        </div>
+        <div class="tile">
+          <div class="tile-lbl">Salario diario</div>
+          <div class="tile-val">${fmtCOP(calc.salDiario)}</div>
+          <div class="tile-sub">Base / 30 días</div>
+        </div>
+        <div class="tile">
+          <div class="tile-lbl">Conceptos liquidados</div>
+          <div class="tile-val">${calc.lineas.filter(l=>l.aplica).length}</div>
+          <div class="tile-sub">Según ley aplicable</div>
+        </div>
+      </div>
+
+      <!-- Breakdown -->
+      <h3 style="margin-bottom:12px;">Desglose del cálculo</h3>
+      <div class="breakdown-list mb-24">
+        ${calc.lineas.map(l=>{
+          const cls=!l.aplica?"bd-na":"";
+          return `<div class="bd-row" data-key="${l.key}">
+            <div class="bd-header">
+              <span class="bd-name ${cls}">${escHtml(l.concepto)}${!l.aplica?" (no aplica)":""}</span>
+              <div class="bd-right">
+                <span class="bd-val mono">${l.aplica?fmtCOP(l.v):"—"}</span>
+                <span class="bd-toggle">▶</span>
+              </div>
+            </div>
+            <div class="bd-detail">
+              <div class="bd-formula">${escHtml(l.formula)}</div>
+              <div style="font-size:13px;color:var(--muted);">${escHtml(l.vars)}</div>
+              ${l.nota?`<div class="bd-nota">${escHtml(l.nota)}</div>`:""}
+              <span class="bd-ref">${escHtml(l.ref)}</span>
+            </div>
+          </div>`;
+        }).join("")}
+        <div class="bd-row">
+          <div class="bd-header" style="cursor:default;background:var(--brand-50);">
+            <span class="bd-name fw-600" style="color:var(--brand);">Total según la ley</span>
+            <span class="bd-val mono fw-700" style="color:var(--brand);font-size:17px;">${fmtCOP(tNorma)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ad Slot 5: Results Mid Rectangle -->
+      <div class="ad-slot ad-slot-md mb-24" id="ad-res-mid" style="max-width:336px;margin:0 auto 24px;" aria-label="Espacio publicitario">
+        <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">300×250</span></div>
+      </div>
+
+      <!-- Empresa comparison (optional, expandable) -->
+      <div class="empresa-section mb-24">
+        <div class="empresa-trigger" id="emp-trigger">
+          <span>📊 ${t("empPrompt")}</span>
+          <span class="mono text-xs text-muted" id="emp-arrow">▼ Abrir</span>
+        </div>
+        <div class="empresa-body" id="emp-body">
+          <p class="text-sm text-muted mb-16">Ingresa los valores tal como aparecen en la propuesta de liquidación de la empresa. Deja en cero lo que no aplique.</p>
+          <div class="empresa-fields" id="emp-fields">
+            ${EMP_MAP.map(m=>`
+            <div class="field">
+              <div class="field-label">${escHtml(m.lbl)}</div>
+              <input type="number" inputmode="decimal" min="0" name="emp_${m.empF}"
+                value="${sanitizeNum(d.empresaConceptos[m.empF])||""}" placeholder="0"/>
+            </div>`).join("")}
+          </div>
+          <div class="empresa-total mt-16">
+            <div class="text-xs text-muted mono mb-4">Total propuesto por empresa</div>
+            <div class="tile-val mono" id="emp-total-val">${tieneEmp?fmtCOP(tEmp):"$0"}</div>
+          </div>
+          ${tieneEmp?`
+          <div id="emp-compare-section" style="margin-top:20px;">
+            ${b?`<div class="band band-${b.code} mb-16"><div class="band-mark">${b.mark}</div><div><div class="band-title">${b.title}</div><div class="band-body">${b.body}</div></div></div>`:""}
+            <div class="card" style="overflow:hidden;margin-top:14px;">
+              <table class="data">
+                <thead><tr><th>Concepto</th><th class="num">Norma</th><th class="num">Empresa</th><th class="num">Diferencia</th></tr></thead>
+                <tbody>
+                  ${compRows.map(r=>`<tr class="${r.diff<0?"neg":r.diff>0?"pos":""}">
+                    <td>${escHtml(r.lbl)}</td>
+                    <td class="num">${fmtCOP(r.norma)}</td>
+                    <td class="num">${fmtCOP(r.emp)}</td>
+                    <td class="num diff">${(r.diff>=0?"+":"")+fmtCOP(r.diff)}</td>
+                  </tr>`).join("")}
+                  <tr class="total">
+                    <td>Total</td>
+                    <td class="num">${fmtCOP(tNorma)}</td>
+                    <td class="num">${fmtCOP(tEmp)}</td>
+                    <td class="num ${diff<0?"neg":"pos"}">${(diff>=0?"+":"")+fmtCOP(diff)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>`:""}
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      ${alertas.length?`
+      <div class="mb-24">
+        <h3 style="margin-bottom:12px;">Observaciones automáticas</h3>
+        <div class="alert-list">
+          ${alertas.map(a=>`<div class="alert-item ${a.sev}">
+            <div class="alert-tag">${escHtml(a.tag)}</div>
+            ${escHtml(a.txt)}
+          </div>`).join("")}
+        </div>
+      </div>`:`
+      <div class="mb-24"><div class="alert-item info">
+        <div class="alert-tag">Sin observaciones</div>
+        No se detectaron alertas automáticas en los datos ingresados.
+      </div></div>`}
+
+      <!-- Download CTA -->
+      <div class="card mb-24">
+        <div class="card-body" style="text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">📄</div>
+          <h3 style="margin-bottom:8px;">Descarga el informe completo</h3>
+          <p class="text-muted text-sm mb-20">PDF profesional con todas las fórmulas, referencias legales, tabla comparativa y recomendaciones.</p>
+          <button class="btn btn-primary btn-lg" id="btn-pdf-main">⬇ Descargar informe PDF</button>
+        </div>
+      </div>
+
+      <!-- Reset -->
+      <div style="text-align:center;">
+        <button class="btn btn-ghost" id="btn-reset">Nuevo cálculo</button>
+      </div>
+    </div>`;
+
+    // Events
+    document.getElementById("btn-edit")?.addEventListener("click",()=>{ S.step=1; save(); renderWizard(); goTo("wizard"); });
+    [document.getElementById("btn-pdf"), document.getElementById("btn-pdf-main")].forEach(b=>b?.addEventListener("click",()=>generarPDF(calc,alertas,infoId)));
+    document.getElementById("btn-reset")?.addEventListener("click",()=>{
+      if(confirm("¿Borrar todos los datos y empezar un cálculo nuevo?")){ reset(); window._iid=null; renderLanding(); renderRol(); goTo("landing"); }
+    });
+    // Accordion
+    document.querySelectorAll(".bd-header").forEach(h=>{
+      if(h.style.cursor==="default") return;
+      h.addEventListener("click",()=>h.closest(".bd-row")?.classList.toggle("open"));
+    });
+    // Empresa toggle
+    document.getElementById("emp-trigger")?.addEventListener("click",()=>{
+      const body=document.getElementById("emp-body");
+      const arrow=document.getElementById("emp-arrow");
+      if(!body) return;
+      const open=body.classList.toggle("visible");
+      if(arrow) arrow.textContent=open?"▲ Cerrar":"▼ Abrir";
+    });
+    // If already has empresa data, open it
+    if(tieneEmp){
+      document.getElementById("emp-body")?.classList.add("visible");
+      const arr=document.getElementById("emp-arrow");
+      if(arr) arr.textContent="▲ Cerrar";
+    }
+    // Empresa fields live update
+    EMP_MAP.forEach(m=>{
+      const inp=document.querySelector(`input[name="emp_${m.empF}"]`);
+      if(inp) inp.addEventListener("input",e=>{ d.empresaConceptos[m.empF]=e.target.value; save(); refreshEmpTotal(); });
+    });
+    function refreshEmpTotal(){
+      const t=Object.values(d.empresaConceptos).reduce((s,v)=>s+(Number(v)||0),0);
+      const el=document.getElementById("emp-total-val"); if(el) el.textContent=fmtCOP(t);
+    }
+  }
+</script>
+
+<!-- ============================================================
+     PDF GENERATION (Premium)
+     ============================================================ -->
+<script id="pdf-js">
+  // Carga jsPDF bajo demanda (lazy) para no bloquear la carga inicial
+  function cargarjsPDF() {
+    return new Promise((resolve, reject) => {
+      if (window.jspdf && window.jspdf.jsPDF) { resolve(); return; }
+      const s1 = document.createElement('script');
+      s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s1.onload = () => {
+        const s2 = document.createElement('script');
+        s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+        s2.onload = resolve;
+        s2.onerror = () => reject(new Error('No se pudo cargar jsPDF-AutoTable'));
+        document.head.appendChild(s2);
+      };
+      s1.onerror = () => reject(new Error('No se pudo cargar jsPDF. Verifique su conexión.'));
+      document.head.appendChild(s1);
+    });
+  }
+
+  async function generarPDF(calc, alertas, infoId) {
+    // Mostrar indicador de carga
+    const btnPdf = document.getElementById('btn-pdf');
+    const btnPdfMain = document.getElementById('btn-pdf-main');
+    const origText1 = btnPdf?.textContent, origText2 = btnPdfMain?.textContent;
+    if (btnPdf) { btnPdf.textContent = 'Cargando PDF…'; btnPdf.disabled = true; }
+    if (btnPdfMain) { btnPdfMain.textContent = 'Generando PDF…'; btnPdfMain.disabled = true; }
+
+    try {
+      await cargarjsPDF();
+    } catch(e) {
+      if (btnPdf) { btnPdf.textContent = origText1; btnPdf.disabled = false; }
+      if (btnPdfMain) { btnPdfMain.textContent = origText2; btnPdfMain.disabled = false; }
+      flashErr('No se pudo cargar el generador de PDF. Verifique su conexión a internet.');
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:"portrait", unit:"pt", format:"a4" });
+    const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
+    const M=40, CW=W-2*M;
+    const C = { brand:[12,58,94], brandMid:[30,92,142], accent:[196,127,23], text:[26,25,21],
+                muted:[138,131,123], line:[224,219,212], green:[26,107,74], red:[155,28,28],
+                bg:[246,244,240], white:[255,255,255] };
+    let y=0, pageNum=0;
+
+    const HDR_H = 58; // altura banda header
+
+    // Función reutilizable — la llaman newPage() Y los hooks de autoTable
+    function drawHeader() {
+      doc.setFillColor(...C.brand);
+      doc.rect(0,0,W,HDR_H,"F");
+
+      // ── Columna izquierda (x desde M, max hasta mitad de página) ──
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(15);
+      doc.setTextColor(...C.white);
+      doc.text("LIQUIA", M, 20);
+
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(8);
+      doc.setTextColor(190,215,238);
+      doc.text("Calculadora de Liquidación Laboral en Colombia", M, 33);
+
+      doc.setFontSize(7);
+      doc.setTextColor(150,185,220);
+      doc.text("CST + Ley 2466/2025 + Decreto 0159/2026", M, 44);
+
+      // ── Columna derecha (x = W−M, alineado derecha) ──
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(200,225,242);
+      doc.text(infoId, W-M, 20, {align:"right"});
+
+      doc.setFontSize(7.5);
+      doc.text(`Generado: ${fmtDate(HOY)}`, W-M, 31, {align:"right"});
+
+      doc.setFontSize(7);
+      doc.setTextColor(150,185,220);
+      doc.text("No constituye asesoría jurídica · liquia.co", W-M, 44, {align:"right"});
+    }
+
+    function newPage() {
+      if(pageNum>0) doc.addPage();
+      pageNum++;
+      drawHeader();
+      y = HDR_H + 12;
+    }
+
+    function checkPage(need=80) { if(y+need>H-60) newPage(); }
+
+    function sectionTitle(txt) {
+      checkPage(30);
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(10);
+      doc.setTextColor(...C.brand);
+      doc.text(txt,M,y); y+=4;
+      doc.setDrawColor(...C.brandMid);
+      doc.setLineWidth(1.5);
+      doc.line(M,y,M+20,y); y+=12;
+      doc.setTextColor(...C.text);
+    }
+
+    function footer(pgTotal) {
+      for(let pageIdx=1;pageIdx<=pgTotal;pageIdx++){
+        doc.setPage(pageIdx);
+        const fY=H-28;
+        doc.setDrawColor(...C.line);
+        doc.setLineWidth(0.5);
+        doc.line(M,fY-8,W-M,fY-8);
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(7.5);
+        doc.setTextColor(...C.muted);
+        doc.text("Liquia es de uso informativo. No constituye asesoría jurídica. Consulte un especialista ante dudas. · liquia.co",M,fY);
+        doc.text(`Pág. ${pageIdx} / ${pgTotal}`,W-M,fY,{align:"right"});
+      }
+    }
+
+    const d=S.datos;
+    newPage();
+
+    // ── Datos generales ──────────────────────────────
+    sectionTitle("1. Datos del contrato");
+    const datosRows=[
+      ["Tipo de contrato", labelContrato(d.tipoContrato)],
+      ["Motivo de terminación", labelMotivo(d.motivoTerminacion)],
+      ["Fecha de ingreso", fmtDate(d.fechaIngreso)],
+      ["Fecha de terminación", fmtDate(d.fechaTerminacion)],
+      ["Tiempo de servicio", tiempoHumano(calc.dias) + ` (${calc.dias} días comerciales · ${calc.diasCal} calendario)`],
+      ["Tipo de salario", labelTipoSal(d.tipoSalario)],
+      ["Modalidad laboral", labelMod(d.modalidadLaboral)],
+      ["Salario mensual base", fmtCOP(calc.base.baseSinAux)],
+      [`${calc.base.tipoAux}`, calc.base.aplica ? fmtCOP(calc.base.auxMensual)+" (aplica)" : "No aplica"],
+      ["Base con auxilio (para prestaciones)", fmtCOP(calc.base.baseConAux)],
+      ["Salario diario", fmtCOP(calc.salDiario)],
+      ["Período de prueba", d.periodoPrueba?"Sí":"No"],
+      ["Fuero o estabilidad reforzada", d.fueroEspecial?"Sí":"No"],
+    ];
+    doc.autoTable({startY:y, head:[["Campo","Valor"]], body:datosRows,
+      theme:"grid", styles:{font:"helvetica",fontSize:8.5,cellPadding:5,lineColor:C.line,lineWidth:.3},
+      headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
+      columnStyles:{0:{cellWidth:200},1:{halign:"left"}}, margin:{left:M,right:M},
+      didAddPage: function(){drawHeader(); pageNum++;}});
+    y=doc.lastAutoTable.finalY+20;
+
+    // ── Liquidación según norma ──────────────────────
+    checkPage(100);
+    sectionTitle("2. Liquidación según la ley");
+
+    // Total highlight box
+    doc.setFillColor(...C.brand);
+    doc.roundedRect(M,y,CW,44,4,4,"F");
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(10);
+    doc.setTextColor(...C.white);
+    doc.text("TOTAL LIQUIDACIÓN SEGÚN LA LEY",M+12,y+16);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(16);
+    doc.text(fmtCOP(calc.total),W-M-12,y+28,{align:"right"});
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(8);
+    doc.setTextColor(180,210,240);
+    doc.text(`${calc.lineas.filter(l=>l.aplica).length} conceptos · ${calc.dias} días`,M+12,y+32);
+    y+=56;
+
+    const normaBody=calc.lineas.filter(l=>l.aplica).map(l=>[
+      {content:`${l.concepto}\n${l.ref}`,styles:{fontStyle:"bold"}},
+      {content:`${l.formula}\n${l.vars}${l.nota?"\n"+l.nota:""}`,styles:{textColor:[100,95,90],fontSize:8}},
+      {content:fmtCOP(l.v),styles:{halign:"right",fontStyle:"bold"}}
+    ]);
+    normaBody.push([
+      {content:"TOTAL",styles:{fontStyle:"bold",fillColor:C.bg}},
+      {content:"",styles:{fillColor:C.bg}},
+      {content:fmtCOP(calc.total),styles:{fontStyle:"bold",halign:"right",fillColor:C.bg}}
+    ]);
+    doc.autoTable({startY:y,head:[["Concepto / Norma","Fórmula y variables","Valor"]],body:normaBody,
+      theme:"grid",styles:{font:"helvetica",fontSize:8,cellPadding:5,lineColor:C.line,lineWidth:.3,valign:"top"},
+      headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
+      columnStyles:{0:{cellWidth:140},1:{cellWidth:"auto"},2:{cellWidth:90,halign:"right"}},
+      margin:{left:M,right:M}, didAddPage: function(){drawHeader(); pageNum++;}});
+    y=doc.lastAutoTable.finalY+20;
+
+    // ── Empresa ──────────────────────────────────────
+    const tEmp=Object.values(d.empresaConceptos||{}).reduce((s,v)=>s+(Number(v)||0),0);
+    const tieneEmp=tEmp>0;
+    if(tieneEmp){
+      checkPage(120);
+      sectionTitle("3. Propuesta de la empresa");
+      const diff=tEmp-calc.total;
+      const empBody=EMP_MAP.map(m=>{
+        const v=Number(d.empresaConceptos[m.empF]||0);
+        return [m.lbl, v>0?fmtCOP(v):"—"];
+      });
+      empBody.push([{content:"TOTAL",styles:{fontStyle:"bold"}},{content:fmtCOP(tEmp),styles:{fontStyle:"bold",halign:"right"}}]);
+      doc.autoTable({startY:y,head:[["Concepto","Valor empresa"]],body:empBody,
+        theme:"grid",styles:{font:"helvetica",fontSize:9,cellPadding:5,lineColor:C.line,lineWidth:.3},
+        headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
+        columnStyles:{0:{cellWidth:220},1:{halign:"right"}},margin:{left:M,right:M},
+        didAddPage: function(){drawHeader(); pageNum++;}});
+      y=doc.lastAutoTable.finalY+14;
+
+      // Diff box
+      const dColor=diff<0?C.red:(diff===0?C.green:C.green);
+      doc.setFillColor(diff<0?250:240,diff<0?235:248,diff<0?235:244);
+      doc.setDrawColor(...(diff<0?C.red:C.green));
+      doc.roundedRect(M,y,CW,40,4,4,"FD");
+      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...(diff<0?C.red:C.green));
+      doc.text(diff<0?"Diferencia (empresa paga MENOS)":"Diferencia (empresa paga más / igual)",M+12,y+14);
+      doc.setFontSize(14);
+      doc.text((diff>=0?"+":"")+fmtCOP(diff),W-M-12,y+26,{align:"right"});
+      doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...C.muted);
+      const pct=calc.total>0?Math.abs(diff/calc.total)*100:0;
+      doc.text(`${pct.toFixed(1)}% de diferencia en valor absoluto`,M+12,y+28);
+      y+=52;
+
+      // Comparison table
+      checkPage(100);
+      const cmpBody=EMP_MAP.map(m=>{
+        const norma=m.normaKeys.reduce((s,k)=>{const l=calc.lineas.find(x=>x.key===k);return s+(l&&l.aplica?l.v:0);},0);
+        const emp=Number(d.empresaConceptos[m.empF]||0);
+        const df=emp-norma;
+        return [m.lbl,fmtCOP(norma),fmtCOP(emp),(df>=0?"+":"")+fmtCOP(df),
+          norma===0&&emp===0?"—":((df>=0?"+":"")+(df/norma*100||0).toFixed(1)+"%")];
+      });
+      cmpBody.push([{content:"TOTAL",styles:{fontStyle:"bold"}},{content:fmtCOP(calc.total),styles:{fontStyle:"bold",halign:"right"}},
+        {content:fmtCOP(tEmp),styles:{fontStyle:"bold",halign:"right"}},
+        {content:(diff>=0?"+":"")+fmtCOP(diff),styles:{fontStyle:"bold",halign:"right"}},
+        {content:calc.total>0?((diff/calc.total)*100).toFixed(2)+"%":"—",styles:{fontStyle:"bold",halign:"right"}}]);
+      doc.autoTable({startY:y,head:[["Concepto","Norma","Empresa","Diferencia","Δ %"]],body:cmpBody,
+        theme:"grid",styles:{font:"helvetica",fontSize:8.5,cellPadding:4,lineColor:C.line,lineWidth:.3},
+        headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
+        columnStyles:{0:{cellWidth:130},1:{halign:"right"},2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}},
+        margin:{left:M,right:M}, didAddPage: function(){drawHeader(); pageNum++;}});
+      y=doc.lastAutoTable.finalY+20;
+    }
+
+    // ── Alertas ──────────────────────────────────────
+    const secN = tieneEmp?"4":"3";
+    checkPage(60);
+    sectionTitle(`${secN}. Observaciones técnicas`);
+    if(!alertas.length){
+      doc.setFont("helvetica","italic"); doc.setFontSize(9); doc.setTextColor(...C.muted);
+      doc.text("No se detectaron observaciones automáticas.",M,y); y+=18;
+    } else {
+      const obsBody=alertas.map(a=>[
+        a.sev==="critical"?"CRÍTICO":a.sev==="info"?"INFO":"ADVERTENCIA",
+        a.tag, a.txt
+      ]);
+      doc.autoTable({startY:y,head:[["Nivel","Categoría","Detalle"]],body:obsBody,
+        theme:"grid",styles:{font:"helvetica",fontSize:8,cellPadding:4,lineColor:C.line,lineWidth:.3,valign:"top"},
+        headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
+        columnStyles:{0:{cellWidth:55},1:{cellWidth:100}},margin:{left:M,right:M},
+        didAddPage: function(){drawHeader(); pageNum++;}});
+      y=doc.lastAutoTable.finalY+20;
+    }
+
+    // ── Recomendaciones ──────────────────────────────
+    const secM = tieneEmp?"5":"4";
+    checkPage(80);
+    sectionTitle(`${secM}. Recomendaciones de acción`);
+    const recos=[
+      "Solicite el desglose por escrito al empleador. Cada concepto debe poder explicarse con su fórmula, base salarial y artículo del CST.",
+      "Conserve el contrato firmado, los desprendibles de nómina de los últimos 12 meses y toda comunicación sobre la terminación.",
+      "Si la diferencia supera el 5%, considere consultar a un abogado laboralista o acudir al Ministerio de Trabajo antes de firmar.",
+      "Las acciones laborales prescriben a los 3 años contados desde la exigibilidad (Art. 488 CST). No deje pasar tiempo si hay diferencias.",
+      "Ministerio de Trabajo Colombia: www.mintrabajo.gov.co · Línea gratuita: 01 8000 11 3380 · Generado con Liquia (liquia.co)",
+    ];
+    doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...C.text);
+    recos.forEach((r,i)=>{
+      checkPage(28);
+      const t=doc.splitTextToSize(`${i+1}. ${r}`, CW-16);
+      doc.text(t,M+8,y); y+=t.length*12+5;
+    });
+
+    footer(doc.internal.getNumberOfPages());
+    doc.save(`liquia_liquidacion_${infoId}.pdf`);
+
+    // Restaurar botones
+    if (btnPdf) { btnPdf.textContent = origText1; btnPdf.disabled = false; }
+    if (btnPdfMain) { btnPdfMain.textContent = origText2; btnPdfMain.disabled = false; }
+  }
+
+  function labelContrato(c){return({indefinido:"Término indefinido",fijo:"Término fijo",obra:"Obra o labor",aprendizaje:"Aprendizaje SENA",domestico:"Servicio doméstico"})[c]||c;}
+  function labelMotivo(m){return({renuncia:"Renuncia voluntaria",despido_sin_justa:"Despido sin justa causa",despido_con_justa:"Despido con justa causa",mutuo:"Mutuo acuerdo",vencimiento:"Vencimiento del término",obra_terminada:"Terminación de la obra",muerte:"Muerte del trabajador",abandono:"Abandono del cargo"})[m]||m;}
+  function labelTipoSal(t){return({fijo:"Ordinario fijo",variable:"Ordinario variable",integral:"Integral"})[t]||t;}
+  function labelMod(m){return({presencial:"Presencial",teletrabajo:"Teletrabajo",hibrido:"Híbrido"})[m]||m;}
+  function labelMod_rol(r){return({trabajador:"Para trabajador",empresa:"Para empleador"})[r]||"General";}
+</script>
+
+<!-- ============================================================
+     BOOT
+     ============================================================ -->
+<script id="boot-js">
+  // Mostrar fecha dinámica en header
+  (function(){
+    const el = document.getElementById("header-date");
+    if (el) {
+      const d = new Date();
+      el.textContent = d.toLocaleDateString("es-CO", {day:"2-digit",month:"short",year:"numeric"});
+    }
+  })();
+
+  // Iniciar la aplicación con manejo de errores
+  try {
+    boot();
+  } catch(e) {
+    const main = document.getElementById("main");
+    if (main) {
+      main.innerHTML = `
+        <div style="padding:40px 24px;text-align:center;font-family:-apple-system,Arial,sans-serif;max-width:480px;margin:0 auto;">
+          <div style="font-size:40px;margin-bottom:16px;">⚠️</div>
+          <h2 style="margin-bottom:12px;color:#0c3a5e;">Error al cargar Liquia</h2>
+          <p style="color:#6b7280;line-height:1.6;margin-bottom:20px;">Ocurrió un error inesperado. Por favor recarga la página o abre el archivo en un navegador actualizado (Chrome, Safari, Firefox).</p>
+          <button onclick="location.reload()"
+            style="background:#0c3a5e;color:white;border:none;padding:12px 24px;border-radius:8px;font-size:15px;cursor:pointer;">
+            Recargar
+          </button>
+          <p style="margin-top:16px;font-size:11px;color:#9ca3af;">${e.message}</p>
+        </div>`;
+    }
+  }
+</script>
+</body>
+</html>

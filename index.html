@@ -2109,26 +2109,26 @@ function renderAd(id) {
       fill(...P.brand);
       doc.rect(0, 0, PW, HDR, "F");
 
-      // Acento lateral izquierdo
+      // Acento lateral izquierdo — 4pt, mismo alto que la banda exacta
       fill(...P.accent);
       doc.rect(0, 0, 4, HDR, "F");
 
       // Logo tipo texto — LIQUIA
       p("h","bold"); fs(FS.h1); fc(...P.white);
-      txt("LIQUIA", ML, 22);
+      txt("LIQUIA", ML, 21);
 
       // Subtítulo
       p("h","normal"); fs(FS.small); fc(185, 213, 236);
-      txt("Calculadora de Liquidación Laboral en Colombia", ML, 34);
+      txt("Calculadora de Liquidación Laboral en Colombia", ML, 33);
       fs(FS.micro); fc(145, 182, 218);
-      txt("CST + Ley 2466/2025 + Decreto 0159/2026", ML, 44);
+      txt("CST + Ley 2466/2025 + Decreto 0159/2026", ML, 43);
 
-      // Columna derecha — ID y fecha
-      fs(FS.small); fc(195, 222, 240);
-      txt(infoId, PW - MR, 22, {align:"right"});
-      txt("Generado: " + fmtDate(HOY), PW - MR, 34, {align:"right"});
+      // Columna derecha — ID, fecha y URL alineados derecha
+      p("h","normal"); fs(FS.small); fc(195, 222, 240);
+      txt(infoId, PW - MR, 21, {align:"right"});
+      txt("Generado: " + fmtDate(HOY), PW - MR, 33, {align:"right"});
       fs(FS.micro); fc(145, 182, 218);
-      txt("liquia.co", PW - MR, 44, {align:"right"});
+      txt("liquia.co · No constituye asesoría jurídica", PW - MR, 43, {align:"right"});
     }
 
     /* ── FOOTER (pasa en el loop final sobre todas las páginas) */
@@ -2139,8 +2139,8 @@ function renderAd(id) {
         stroke(...P.line); lw(0.5);
         doc.line(ML, fy - 10, PW - MR, fy - 10);
         p("h","normal"); fs(FS.micro); fc(...P.muted);
-        txt("Liquia es de uso informativo · No constituye asesoría jurídica · Consulte un especialista", ML, fy);
-        txt(`${i} / ${total}`, PW - MR, fy, {align:"right"});
+        txt("Liquia · Uso informativo · No constituye asesoría jurídica · liquia.co", ML, fy);
+        txt(`Pág. ${i} / ${total}`, PW - MR, fy, {align:"right"});
       }
     }
 
@@ -2302,7 +2302,7 @@ function renderAd(id) {
       body: normaBody,
       columnStyles: {
         0: { cellWidth: 145 },
-        1: { cellWidth: 240 },
+        1: { cellWidth: 274 },
         2: { cellWidth: 88, halign:"right" },
       },
     }));
@@ -2393,11 +2393,11 @@ function renderAd(id) {
         head: [["Concepto", "Norma", "Empresa", "Diferencia", "Δ %"]],
         body: cmpBody,
         columnStyles: {
-          0: { cellWidth: 140 },
-          1: { cellWidth: 82, halign:"right" },
-          2: { cellWidth: 82, halign:"right" },
-          3: { cellWidth: 94, halign:"right" },
-          4: { cellWidth: 55, halign:"right" },
+          0: { cellWidth: 160 },
+          1: { cellWidth: 88, halign:"right" },
+          2: { cellWidth: 88, halign:"right" },
+          3: { cellWidth: 104, halign:"right" },
+          4: { cellWidth: 67, halign:"right" },
         },
       }));
       pageY = doc.lastAutoTable.finalY + 22;
@@ -2411,10 +2411,12 @@ function renderAd(id) {
     secTitle(`${nObs}. Observaciones técnicas`);
 
     if (!alertas.length) {
-      need(20);
-      p("h","italic"); fs(FS.body); fc(...P.muted);
-      txt("No se detectaron observaciones automáticas.", ML + 10, pageY);
-      pageY += 20;
+      need(30);
+      fill(...P.bg); stroke(...P.line); lw(0.4);
+      doc.roundedRect(ML, pageY, CW, 24, 3, 3, "FD");
+      p("h","normal"); fs(FS.body); fc(...P.muted);
+      txt("No se detectaron observaciones automáticas para los datos ingresados.", ML + 10, pageY + 15);
+      pageY += 36;
     } else {
       const sevLabel = { critical:"CRÍTICO", warn:"ALERTA", info:"INFO" };
       const sevColor = { critical: P.red, warn: P.accent, info: P.brand };

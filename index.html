@@ -781,10 +781,15 @@ table.data tr.neg td.diff{color:var(--red)}
     const priR = calcPrima(bc, diasSem, d.tipoSalario);
     const primPend = Number(d.primaPendiente||0);
     const vacR = calcVacaciones(base.baseVac, dias, d.diasVacacionesDisfrutadas, d.diasVacacionesPendientesAnt, d.tipoSalario, base.baseIntVac);
+
+    // Salario diario CON auxilio → cesantías, prima, salarios pendientes
     const salDiario = bc/30;
-    const indemR = calcIndem(d, salDiario, bc);
+    // Salario diario SIN auxilio → indemnización (Art. 64 CST; el auxilio no es salario — Art. 128 CST)
+    // La Ley 1/1963 Art. 7 incluye el auxilio solo para cesantías y prima, no para indemnización
+    const salDiarioPuro = base.baseSinAux / 30;
+    const indemR = calcIndem(d, salDiarioPuro, bc);
     const diasSalPend = Number(d.diasSalariosPendientes||0);
-    const salPend = salDiario * diasSalPend;
+    const salPend = salDiario * diasSalPend; // salarios pendientes: base con auxilio (Art. 127 CST)
     const extras = Number(d.extrasComisionesPend||0);
     const cesPendAnt = Number(d.cesantiasPendientesAnt||0);
     const lineas = [
@@ -816,14 +821,15 @@ table.data tr.neg td.diff{color:var(--red)}
     lineas.push(
       { key:"vacaciones", aplica:vacR.aplica, concepto:"Vacaciones compensadas",
         formula:"(Salario/30) × Días netos",
-        vars:`Base vac: ${fmtCOP(d.tipoSalario==="integral"?base.baseIntVac:base.baseVac)} · Causados: ${vacR.causados.toFixed(2)} · Disfrutados: ${d.diasVacacionesDisfrutadas||0} · Pend. ant.: ${d.diasVacacionesPendientesAnt||0} · Netos: ${vacR.netos.toFixed(2)}`,
+        vars:`Base: ${fmtCOP(d.tipoSalario==="integral"?base.baseIntVac:base.baseVac)} (sin auxilio · Art. 192 CST)\nCausados: ${vacR.causados.toFixed(2)} · Disfrutados: ${d.diasVacacionesDisfrutadas||0} · Pend.ant.: ${d.diasVacacionesPendientesAnt||0} · Netos: ${vacR.netos.toFixed(2)}`,
         ref:"Art. 186 y 189 CST", v:vacR.v },
       { key:"indemnizacion", aplica:indemR.aplica, concepto:"Indemnización por terminación",
         formula: indemR.regla==="bajo" ? "Sal. diario × [30 + 20×(años-1) + 20×fracc.]" :
                  indemR.regla==="alto" ? "Sal. diario × [20 + 15×(años-1) + 15×fracc.]" :
                  indemR.aplica ? "Según tipo de contrato" : "No aplica",
-        vars: indemR.aplica ? `Sal. diario: ${fmtCOP(salDiario)} · Días indem.: ${indemR.dias?.toFixed(2)||"n/a"}` : (indemR.nota||"—"),
-        nota:indemR.nota, ref:"Art. 64 CST", v:indemR.v||0 }
+        vars: indemR.aplica ? `Sal. diario sin auxilio: ${fmtCOP(salDiarioPuro)} · Días indem.: ${indemR.dias?.toFixed(2)||"n/a"} · Base: salario ordinario sin auxilio (Art. 128 CST)` : (indemR.nota||"—"),
+        nota: base.aplica && indemR.aplica ? `Auxilio de transporte excluido de la base (Art. 64 y 128 CST · Ley 1/1963 Art. 7 no aplica a indemnización)` : indemR.nota,
+        ref:"Art. 64 CST", v:indemR.v||0 }
     );
     if (diasSalPend>0) lineas.push(
       { key:"salarios_pend", aplica:true, concepto:"Salarios pendientes último período",
@@ -2008,9 +2014,14 @@ table.data tr.neg td.diff{color:var(--red)}
       {content:fmtCOP(calc.total),styles:{fontStyle:"bold",halign:"right",fillColor:C.bg}}
     ]);
     doc.autoTable({startY:y,head:[["Concepto / Norma","Fórmula y variables","Valor"]],body:normaBody,
-      theme:"grid",styles:{font:"helvetica",fontSize:8,cellPadding:5,lineColor:C.line,lineWidth:.3,valign:"top"},
+      theme:"grid",
+      styles:{font:"helvetica",fontSize:8,cellPadding:{top:5,right:5,bottom:6,left:5},lineColor:C.line,lineWidth:.3,valign:"top",overflow:"linebreak"},
       headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-      columnStyles:{0:{cellWidth:140},1:{cellWidth:"auto"},2:{cellWidth:90,halign:"right"}},
+      columnStyles:{
+        0:{cellWidth:138, overflow:"linebreak"},
+        1:{cellWidth:245, overflow:"linebreak"},
+        2:{cellWidth:90, halign:"right"}
+      },
       margin:{left:M,right:M}, didAddPage: function(){drawHeader(); pageNum++;}});
     y=doc.lastAutoTable.finalY+20;
 

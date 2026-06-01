@@ -110,20 +110,34 @@ img{max-width:100%;height:auto}
 .screen.active{display:block;animation:fadeIn 160ms ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-/* ---- Ad Slots ---- */
+/* ================================================================
+   AD SYSTEM — slots activos y placeholders
+   ================================================================ */
 .ad-slot{
-  width:100%;background:var(--s2);border:1px dashed var(--border-s);
-  border-radius:var(--r);display:flex;align-items:center;justify-content:center;
-  color:var(--muted);font-size:11px;font-family:var(--mono);overflow:hidden;
-  text-align:center
+  width:100%;border-radius:var(--r);overflow:hidden;
+  display:block;position:relative;text-decoration:none
 }
-.ad-slot-sm{min-height:52px}
-.ad-slot-md{min-height:120px}
-.ad-slot-rect{min-height:260px}
-@media(min-width:728px){.ad-slot-banner{min-height:92px}}
-.ad-inner{padding:12px;pointer-events:none}
-.ad-inner .ad-label{display:block;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
-.ad-inner .ad-dims{font-size:10px;opacity:.6}
+/* Placeholder (slot disponible) */
+.ad-ph{
+  background:var(--s2);border:1.5px dashed var(--border-s);
+  border-radius:var(--r);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;
+  padding:14px 20px;text-align:center;width:100%;height:100%
+}
+.ad-ph-icon{font-size:20px;opacity:.45;line-height:1}
+.ad-ph-name{font-size:10px;font-family:var(--mono);font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px}
+.ad-ph-msg{font-size:12px;color:var(--muted);line-height:1.45;max-width:28ch}
+.ad-ph-dims{font-size:10px;font-family:var(--mono);color:var(--border-s);margin-top:2px}
+/* Banner activo */
+.ad-active{display:block;text-decoration:none;border-radius:var(--r);overflow:hidden;
+  transition:opacity 100ms}
+.ad-active:hover{opacity:.92}
+.ad-active img{display:block;width:100%;height:100%;object-fit:cover;border-radius:var(--r)}
+/* Tamaños mínimos por tipo */
+.ad-sz-banner{min-height:52px}
+.ad-sz-rect{min-height:250px}
+.ad-sz-half{min-height:390px}
 
 /* ---- Typography ---- */
 .text-sm{font-size:14px}
@@ -520,10 +534,8 @@ table.data tr.neg td.diff{color:var(--red)}
 
   <!-- FOOTER -->
   <footer class="app-footer">
-    <!-- Ad Slot 6: Footer Banner -->
-    <div class="ad-slot ad-slot-sm ad-slot-banner" id="ad-footer" style="max-width:728px;margin:0 auto 16px;" aria-label="Espacio publicitario">
-      <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">728×90 · 320×50</span></div>
-    </div>
+    <!-- Ad Slot 6: Footer -->
+    <div id="ad-footer-wrap" style="max-width:728px;margin:0 auto 16px;"></div>
     <div><strong>Liquia</strong> · Calculadora de Liquidación Laboral en Colombia · Cálculo basado en <strong>CST · Ley 2466/2025 · Decreto 0159/2026</strong>.</div>
     <div style="margin-top:4px;">
       <strong>Liquia</strong> <strong>NO constituye asesoría jurídica</strong>. Es de uso informativo. Consulte un especialista laboral para casos complejos.
@@ -546,8 +558,131 @@ table.data tr.neg td.diff{color:var(--red)}
 </script>
 
 <!-- ============================================================
-     SECURITY HELPERS
+     ADS — Configuración y renderizado de espacios publicitarios
      ============================================================ -->
+<script id="ads-js">
+/*
+ * ADS_CONFIG — Inventario de los 6 espacios publicitarios de Liquia.
+ *
+ * Para activar un espacio:
+ *   1. Cambiar activo: true
+ *   2. Poner la URL pública de la imagen en 'imagen'
+ *   3. Poner la URL de destino del anunciante en 'link'
+ *   4. Actualizar 'alt' con el nombre del anunciante (accesibilidad y SEO)
+ *
+ * Para desactivar un espacio:
+ *   1. Cambiar activo: false
+ *   → El slot muestra automáticamente el placeholder de disponible.
+ *
+ * Cada espacio es completamente independiente. Cambiar uno no
+ * afecta a los demás. No hay lógica que replique anuncios entre slots.
+ */
+const ADS_CONFIG = {
+
+  "ad-landing-top": {
+    nombre   : "Landing Superior",
+    posicion : "Encima del hero · visible al entrar a la herramienta",
+    dims     : "728×90 px desktop · 320×50 px móvil",
+    tamaño   : "banner",   // banner | rect | half
+    activo   : false,
+    imagen   : "",         // URL absoluta de la imagen del banner
+    link     : "",         // URL del anunciante (debe incluir https://)
+    alt      : "",         // Texto alternativo (nombre del anunciante)
+  },
+
+  "ad-landing-mid": {
+    nombre   : "Landing Central",
+    posicion : "Debajo de las features, antes del aviso legal",
+    dims     : "300×250 px",
+    tamaño   : "rect",
+    activo   : false,
+    imagen   : "",
+    link     : "",
+    alt      : "",
+  },
+
+  "ad-wizard-side": {
+    nombre   : "Sidebar Wizard",
+    posicion : "Lateral derecho durante el proceso de cálculo (solo escritorio)",
+    dims     : "300×600 px · oculto en móvil",
+    tamaño   : "half",
+    activo   : false,
+    imagen   : "",
+    link     : "",
+    alt      : "",
+  },
+
+  "ad-res-top": {
+    nombre   : "Resultados Superior",
+    posicion : "Encima de los resultados del cálculo",
+    dims     : "728×90 px desktop · 320×50 px móvil",
+    tamaño   : "banner",
+    activo   : false,
+    imagen   : "",
+    link     : "",
+    alt      : "",
+  },
+
+  "ad-res-mid": {
+    nombre   : "Resultados Central",
+    posicion : "Entre el desglose de conceptos y la sección comparativa",
+    dims     : "300×250 px",
+    tamaño   : "rect",
+    activo   : false,
+    imagen   : "",
+    link     : "",
+    alt      : "",
+  },
+
+  "ad-footer": {
+    nombre   : "Footer",
+    posicion : "Pie de página · visible en todas las pantallas",
+    dims     : "728×90 px desktop · 320×50 px móvil",
+    tamaño   : "banner",
+    activo   : false,
+    imagen   : "",
+    link     : "",
+    alt      : "",
+  },
+
+};
+
+/*
+ * renderAd(id) — devuelve el HTML del slot según su configuración.
+ * Si activo:true y hay imagen+link → muestra el banner clickeable.
+ * Si no → muestra el placeholder de disponible.
+ */
+function renderAd(id) {
+  const cfg = ADS_CONFIG[id];
+  if (!cfg) return '';
+
+  const szClass = { banner:'ad-sz-banner', rect:'ad-sz-rect', half:'ad-sz-half' }[cfg.tamaño] || 'ad-sz-banner';
+
+  if (cfg.activo && cfg.imagen && cfg.link) {
+    // ── Banner activo: imagen clickeable ─────────────────────────
+    return `<a href="${escHtml(cfg.link)}"
+               target="_blank"
+               rel="noopener sponsored"
+               class="ad-slot ad-active ${szClass}"
+               id="${id}"
+               aria-label="${escHtml(cfg.alt || cfg.nombre)}">
+              <img src="${escHtml(cfg.imagen)}"
+                   alt="${escHtml(cfg.alt || cfg.nombre)}"
+                   loading="lazy"/>
+            </a>`;
+  }
+
+  // ── Placeholder: espacio disponible ──────────────────────────
+  return `<div class="ad-slot ${szClass}" id="${id}" aria-label="Espacio publicitario disponible">
+            <div class="ad-ph">
+              <span class="ad-ph-icon">📢</span>
+              <span class="ad-ph-name">${escHtml(cfg.nombre)}</span>
+              <span class="ad-ph-msg">Espacio publicitario disponible.<br>Para contratar este espacio, contacta a los administradores.</span>
+              <span class="ad-ph-dims">${escHtml(cfg.dims)}</span>
+            </div>
+          </div>`;
+}
+</script>
 <script id="sec-js">
   // Escapa caracteres HTML para prevenir XSS al inyectar texto de usuario en innerHTML
   function escHtml(str) {
@@ -996,10 +1131,8 @@ table.data tr.neg td.diff{color:var(--red)}
     const el = document.getElementById("screen-landing");
     el.innerHTML = `
     <div class="landing-wrap">
-      <!-- Ad Slot 1: Top Banner -->
-      <div class="ad-slot ad-slot-sm" id="ad-landing-top" style="max-width:728px;margin:0 auto 0;" aria-label="Espacio publicitario">
-        <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">728×90 · 320×50</span></div>
-      </div>
+      <!-- Ad Slot 1: Landing Superior -->
+      <div style="max-width:728px;margin:0 auto;">${renderAd("ad-landing-top")}</div>
 
       <!-- Hero -->
       <div class="hero-section">
@@ -1039,11 +1172,9 @@ table.data tr.neg td.diff{color:var(--red)}
         </div>
       </div>
 
-      <!-- Ad Slot 2: Landing Mid Rectangle -->
+      <!-- Ad Slot 2: Landing Central -->
       <div class="landing-extra" style="text-align:center;">
-        <div class="ad-slot ad-slot-md" id="ad-landing-mid" style="max-width:336px;margin:0 auto 28px;" aria-label="Espacio publicitario">
-          <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">300×250</span></div>
-        </div>
+        <div style="max-width:336px;margin:0 auto 28px;">${renderAd("ad-landing-mid")}</div>
         <div class="disclaimer" style="max-width:600px;margin:0 auto;text-align:left;">
           <strong>Aviso importante:</strong> Liquia es un motor de cálculo matemático con fines informativos. Los resultados son orientativos. La exactitud depende de los datos ingresados. Ante dudas o disputas, consulte a un abogado laboralista o al Ministerio de Trabajo.
         </div>
@@ -1126,11 +1257,9 @@ table.data tr.neg td.diff{color:var(--red)}
         </div>
       </div>
 
-      <!-- Desktop ad sidebar -->
+      <!-- Desktop ad sidebar — Slot 3 -->
       <div class="wizard-aside">
-        <div class="ad-slot ad-slot-rect" id="ad-wizard-side" aria-label="Espacio publicitario" style="min-height:400px;">
-          <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">300×600</span></div>
-        </div>
+        ${renderAd("ad-wizard-side")}
       </div>
     </div>
 
@@ -1638,10 +1767,8 @@ table.data tr.neg td.diff{color:var(--red)}
         <strong>Liquia es informativa.</strong> No constituye asesoría jurídica. La exactitud depende de los datos ingresados. Ante dudas, consulte con un abogado laboralista o el Ministerio de Trabajo.
       </div>
 
-      <!-- Ad Slot 4: Results Top Banner -->
-      <div class="ad-slot ad-slot-sm mb-24" id="ad-res-top" aria-label="Espacio publicitario">
-        <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">728×90 · 320×50</span></div>
-      </div>
+      <!-- Ad Slot 4: Resultados Superior -->
+      <div class="mb-24">${renderAd("ad-res-top")}</div>
 
       <div class="row-between mb-24">
         <div class="stack gap-4">
@@ -1717,10 +1844,8 @@ table.data tr.neg td.diff{color:var(--red)}
         </div>
       </div>
 
-      <!-- Ad Slot 5: Results Mid Rectangle -->
-      <div class="ad-slot ad-slot-md mb-24" id="ad-res-mid" style="max-width:336px;margin:0 auto 24px;" aria-label="Espacio publicitario">
-        <div class="ad-inner"><span class="ad-label">Publicidad</span><span class="ad-dims">300×250</span></div>
-      </div>
+      <!-- Ad Slot 5: Resultados Central -->
+      <div class="mb-24" style="max-width:336px;margin-left:auto;margin-right:auto;">${renderAd("ad-res-mid")}</div>
 
       <!-- Empresa comparison (optional, expandable) -->
       <div class="empresa-section mb-24">
@@ -2151,16 +2276,22 @@ table.data tr.neg td.diff{color:var(--red)}
      BOOT
      ============================================================ -->
 <script id="boot-js">
-  // Mostrar fecha dinámica en header
+  // Slot 6: Footer — renderizar al cargar (está en HTML estático)
+  (function(){
+    const wrap = document.getElementById('ad-footer-wrap');
+    if (wrap) wrap.innerHTML = renderAd('ad-footer');
+  })();
+
+  // Fecha dinámica en header
   (function(){
     const el = document.getElementById("header-date");
     if (el) {
-      const d = new Date();
-      el.textContent = d.toLocaleDateString("es-CO", {day:"2-digit",month:"short",year:"numeric"});
+      el.textContent = new Date().toLocaleDateString("es-CO",
+        {day:"2-digit", month:"short", year:"numeric"});
     }
   })();
 
-  // Iniciar la aplicación con manejo de errores
+  // Iniciar la aplicación
   try {
     boot();
   } catch(e) {
@@ -2170,7 +2301,7 @@ table.data tr.neg td.diff{color:var(--red)}
         <div style="padding:40px 24px;text-align:center;font-family:-apple-system,Arial,sans-serif;max-width:480px;margin:0 auto;">
           <div style="font-size:40px;margin-bottom:16px;">⚠️</div>
           <h2 style="margin-bottom:12px;color:#0c3a5e;">Error al cargar Liquia</h2>
-          <p style="color:#6b7280;line-height:1.6;margin-bottom:20px;">Ocurrió un error inesperado. Por favor recarga la página o abre el archivo en un navegador actualizado (Chrome, Safari, Firefox).</p>
+          <p style="color:#6b7280;line-height:1.6;margin-bottom:20px;">Por favor recarga la página o abre el archivo en un navegador actualizado.</p>
           <button onclick="location.reload()"
             style="background:#0c3a5e;color:white;border:none;padding:12px 24px;border-radius:8px;font-size:15px;cursor:pointer;">
             Recargar

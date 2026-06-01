@@ -2068,9 +2068,8 @@ function renderAd(id) {
 
     // Paleta unificada
     const P = {
-      brand   : [12,  58,  94 ],   // #0c3a5e
-      brandB  : [6,   38,  66 ],   // más oscuro para detalles
-      accent  : [196, 127, 23 ],   // #c47f17
+      brand   : [12,  58,  94 ],   // #0c3a5e  navy principal
+      accent  : [44, 105, 155 ],   // azul medio — complementa el navy sin calentar el tono
       text    : [30,  29,  27 ],   // casi negro
       sub     : [80,  77,  73 ],   // gris medio
       muted   : [140, 134, 126],   // gris claro
@@ -2079,8 +2078,8 @@ function renderAd(id) {
       white   : [255, 255, 255],
       green   : [22,  101, 70 ],
       red     : [155, 28,  28 ],
-      greenBg : [232, 245, 238],
-      redBg   : [253, 235, 235],
+      greenBg : [235, 246, 240],
+      redBg   : [253, 237, 237],
     };
 
     // Tipografía — tamaños únicos para cada nivel
@@ -2301,22 +2300,10 @@ function renderAd(id) {
       startY: pageY,
       head: [["Concepto / Norma", "Fórmula y variables", "Valor"]],
       body: normaBody,
-      styles: {
-        font:"helvetica", fontSize: FS.body,
-        cellPadding: { top:6, right:6, bottom:7, left:6 },
-        lineColor: P.line, lineWidth: 0.3,
-        valign:"top", overflow:"linebreak",
-        minCellHeight: 26,
-      },
-      headStyles: {
-        fillColor: P.brand, textColor: P.white,
-        fontStyle:"bold", fontSize: FS.body,
-        cellPadding: { top:5, right:6, bottom:5, left:6 },
-      },
       columnStyles: {
         0: { cellWidth: 145 },
         1: { cellWidth: 240 },
-        2: { cellWidth: 88,  halign:"right" },
+        2: { cellWidth: 88, halign:"right" },
       },
     }));
     pageY = doc.lastAutoTable.finalY + 22;

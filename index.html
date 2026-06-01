@@ -126,16 +126,14 @@ img{max-width:100%;height:auto}
 .ad-inner .ad-dims{font-size:10px;opacity:.6}
 
 /* ---- Typography ---- */
-.text-lg{font-size:18px} .text-sm{font-size:14px}
+.text-sm{font-size:14px}
 .text-xs{font-size:12px} .text-muted{color:var(--muted)}
-.mono{font-family:var(--mono)} .tabnum{font-variant-numeric:tabular-nums}
-.fw-500{font-weight:500} .fw-600{font-weight:600} .fw-700{font-weight:700}
+.mono{font-family:var(--mono)}
+.fw-600{font-weight:600} .fw-700{font-weight:700}
 
 /* ---- Containers ---- */
 .container{max-width:860px;width:100%;margin:0 auto;padding:0 20px}
-.container-sm{max-width:560px;width:100%;margin:0 auto;padding:0 20px}
-.container-lg{max-width:1100px;width:100%;margin:0 auto;padding:0 20px}
-@media(min-width:600px){.container,.container-sm,.container-lg{padding:0 28px}}
+@media(min-width:600px){.container{padding:0 28px}}
 
 /* ---- Cards ---- */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh)}
@@ -212,14 +210,18 @@ input.err,select.err{border-color:var(--red)}
 .month-grid .field-label{font-size:11px;color:var(--muted);margin-bottom:3px}
 
 /* ---- Info box ---- */
-.info-box{
-  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
-  padding:14px 16px;font-size:14px;color:var(--t2)
-}
-.info-box .info-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500;margin-bottom:4px}
-.info-box .info-value{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text)}
+
 
 /* ---- Disclaimer ---- */
+
+.band{border-radius:var(--r);padding:16px 18px;border:1px solid;display:flex;gap:14px;align-items:flex-start}
+.band-mark{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.55);flex-shrink:0;white-space:nowrap}
+.band-title{font-weight:600;font-size:15px;margin-bottom:3px}
+.band-body{font-size:13px;line-height:1.5}
+.band-t{background:var(--green-bg);border-color:#a8d9bf;color:var(--green)}
+.band-p{background:var(--brand-light);border-color:#b3cde0;color:var(--brand-mid)}
+.band-s{background:var(--amber-bg);border-color:#e8c36a;color:var(--amber)}
+.band-a{background:var(--red-bg);border-color:#f0b8b8;color:var(--red)}
 .disclaimer{
   background:var(--amber-bg);border:1px solid #e8c36a;border-left:4px solid var(--accent);
   border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--amber);line-height:1.5
@@ -242,14 +244,7 @@ input.err,select.err{border-color:var(--red)}
 .alert-item.info .alert-tag{color:var(--brand)}
 
 /* ---- Difference bands ---- */
-.band{border-radius:var(--r);padding:16px 18px;border:1px solid;display:flex;gap:14px;align-items:flex-start}
-.band-mark{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.55);flex-shrink:0;white-space:nowrap}
-.band-title{font-weight:600;font-size:15px;margin-bottom:3px}
-.band-body{font-size:13px;line-height:1.5}
-.band-t{background:var(--green-bg);border-color:#a8d9bf;color:var(--green)}
-.band-p{background:var(--brand-light);border-color:#b3cde0;color:var(--brand-mid)}
-.band-s{background:var(--amber-bg);border-color:#e8c36a;color:var(--amber)}
-.band-a{background:var(--red-bg);border-color:#f0b8b8;color:var(--red)}
+
 
 /* ---- Tables ---- */
 table.data{width:100%;border-collapse:collapse;font-size:14px}
@@ -821,7 +816,7 @@ table.data tr.neg td.diff{color:var(--red)}
     lineas.push(
       { key:"vacaciones", aplica:vacR.aplica, concepto:"Vacaciones compensadas",
         formula:"(Salario/30) × Días netos",
-        vars:`Base: ${fmtCOP(d.tipoSalario==="integral"?base.baseIntVac:base.baseVac)} (sin auxilio · Art. 192 CST)\nCausados: ${vacR.causados.toFixed(2)} · Disfrutados: ${d.diasVacacionesDisfrutadas||0} · Pend.ant.: ${d.diasVacacionesPendientesAnt||0} · Netos: ${vacR.netos.toFixed(2)}`,
+        vars:`Base: ${fmtCOP(d.tipoSalario==="integral"?base.baseIntVac:base.baseVac)} (sin auxilio · Art. 192 CST)\nCausados: ${vacR.causados.toFixed(4)} · Disfrutados: ${d.diasVacacionesDisfrutadas||0} · Pend.ant.: ${d.diasVacacionesPendientesAnt||0} · Netos: ${vacR.netos.toFixed(4)}`,
         ref:"Art. 186 y 189 CST", v:vacR.v },
       { key:"indemnizacion", aplica:indemR.aplica, concepto:"Indemnización por terminación",
         formula: indemR.regla==="bajo" ? "Sal. diario × [30 + 20×(años-1) + 20×fracc.]" :
@@ -970,13 +965,18 @@ table.data tr.neg td.diff{color:var(--red)}
     S.screen = screen; save();
   }
   function boot() {
+    // Siempre inicia en landing con pantalla limpia.
+    // El estado del formulario se preserva en localStorage solo para
+    // que el usuario pueda continuar en la misma sesión del navegador,
+    // pero nunca se salta directo a resultados al cargar la herramienta.
+    S.screen = "landing";
+    S.step   = 1;
+    window._iid = null; // nuevo ID por sesión de cálculo
+    save();
     renderLanding();
     renderRol();
     renderWizard();
     renderResultado();
-    if (S.screen==="resultado" && S.step>5) { goTo("resultado"); return; }
-    if (S.screen==="wizard" && S.step>=1 && S.step<=5) { goTo("wizard"); return; }
-    if (S.screen==="rol" && !S.rol) { goTo("rol"); return; }
     goTo("landing");
   }
 
@@ -1979,7 +1979,7 @@ table.data tr.neg td.diff{color:var(--red)}
     doc.autoTable({startY:y, head:[["Campo","Valor"]], body:datosRows,
       theme:"grid", styles:{font:"helvetica",fontSize:8.5,cellPadding:5,lineColor:C.line,lineWidth:.3},
       headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-      columnStyles:{0:{cellWidth:200},1:{halign:"left"}}, margin:{left:M,right:M},
+      columnStyles:{0:{cellWidth:200},1:{halign:"left"}}, margin:{top:HDR_H+14, left:M, right:M},
       didAddPage: function(){drawHeader(); pageNum++;}});
     y=doc.lastAutoTable.finalY+20;
 
@@ -2004,25 +2004,41 @@ table.data tr.neg td.diff{color:var(--red)}
     y+=56;
 
     const normaBody=calc.lineas.filter(l=>l.aplica).map(l=>[
-      {content:`${l.concepto}\n${l.ref}`,styles:{fontStyle:"bold"}},
-      {content:`${l.formula}\n${l.vars}${l.nota?"\n"+l.nota:""}`,styles:{textColor:[100,95,90],fontSize:8}},
-      {content:fmtCOP(l.v),styles:{halign:"right",fontStyle:"bold"}}
+      // Col 0: nombre + referencia normativa
+      {content:`${l.concepto}\n${l.ref}`, styles:{fontStyle:"bold", overflow:"linebreak"}},
+      // Col 1: fórmula + variables + nota (separación con \n explícita evita fusión visual)
+      {content:[l.formula, l.vars, l.nota||null].filter(Boolean).join("\n"),
+       styles:{textColor:[100,95,90], fontSize:8, overflow:"linebreak"}},
+      // Col 2: valor — prefijo \u200E (LTR mark) garantiza orden correcto en extracción PDF
+      {content:"\u200E"+fmtCOP(l.v), styles:{halign:"right", fontStyle:"bold", overflow:"linebreak"}}
     ]);
     normaBody.push([
-      {content:"TOTAL",styles:{fontStyle:"bold",fillColor:C.bg}},
-      {content:"",styles:{fillColor:C.bg}},
-      {content:fmtCOP(calc.total),styles:{fontStyle:"bold",halign:"right",fillColor:C.bg}}
+      {content:"TOTAL", styles:{fontStyle:"bold", fillColor:C.bg}},
+      {content:"",      styles:{fillColor:C.bg}},
+      {content:"\u200E"+fmtCOP(calc.total), styles:{fontStyle:"bold", halign:"right", fillColor:C.bg}}
     ]);
-    doc.autoTable({startY:y,head:[["Concepto / Norma","Fórmula y variables","Valor"]],body:normaBody,
+    doc.autoTable({
+      startY:y,
+      head:[["Concepto / Norma","Fórmula y variables","Valor"]],
+      body:normaBody,
       theme:"grid",
-      styles:{font:"helvetica",fontSize:8,cellPadding:{top:5,right:5,bottom:6,left:5},lineColor:C.line,lineWidth:.3,valign:"top",overflow:"linebreak"},
-      headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
+      styles:{
+        font:"helvetica", fontSize:8,
+        cellPadding:{top:6, right:6, bottom:7, left:6},
+        lineColor:C.line, lineWidth:.4,
+        valign:"top", overflow:"linebreak",
+        minCellHeight:28           // evita que celdas muy cortas colapsen con la siguiente
+      },
+      headStyles:{fillColor:C.bg, textColor:C.text, fontStyle:"bold", fontSize:8.5},
       columnStyles:{
         0:{cellWidth:138, overflow:"linebreak"},
         1:{cellWidth:245, overflow:"linebreak"},
-        2:{cellWidth:90, halign:"right"}
+        2:{cellWidth:90,  halign:"right", overflow:"linebreak"}
       },
-      margin:{left:M,right:M}, didAddPage: function(){drawHeader(); pageNum++;}});
+      rowPageBreak:"avoid",        // intenta no cortar filas entre páginas
+      margin:{top:HDR_H+14, left:M, right:M},
+      didAddPage: function(){drawHeader(); pageNum++;}
+    });
     y=doc.lastAutoTable.finalY+20;
 
     // ── Empresa ──────────────────────────────────────
@@ -2040,12 +2056,11 @@ table.data tr.neg td.diff{color:var(--red)}
       doc.autoTable({startY:y,head:[["Concepto","Valor empresa"]],body:empBody,
         theme:"grid",styles:{font:"helvetica",fontSize:9,cellPadding:5,lineColor:C.line,lineWidth:.3},
         headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-        columnStyles:{0:{cellWidth:220},1:{halign:"right"}},margin:{left:M,right:M},
+        columnStyles:{0:{cellWidth:220},1:{halign:"right"}},margin:{top:HDR_H+14, left:M, right:M},
         didAddPage: function(){drawHeader(); pageNum++;}});
       y=doc.lastAutoTable.finalY+14;
 
       // Diff box
-      const dColor=diff<0?C.red:(diff===0?C.green:C.green);
       doc.setFillColor(diff<0?250:240,diff<0?235:248,diff<0?235:244);
       doc.setDrawColor(...(diff<0?C.red:C.green));
       doc.roundedRect(M,y,CW,40,4,4,"FD");
@@ -2075,7 +2090,7 @@ table.data tr.neg td.diff{color:var(--red)}
         theme:"grid",styles:{font:"helvetica",fontSize:8.5,cellPadding:4,lineColor:C.line,lineWidth:.3},
         headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
         columnStyles:{0:{cellWidth:130},1:{halign:"right"},2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}},
-        margin:{left:M,right:M}, didAddPage: function(){drawHeader(); pageNum++;}});
+        margin:{top:HDR_H+14, left:M, right:M}, didAddPage: function(){drawHeader(); pageNum++;}});
       y=doc.lastAutoTable.finalY+20;
     }
 
@@ -2094,7 +2109,7 @@ table.data tr.neg td.diff{color:var(--red)}
       doc.autoTable({startY:y,head:[["Nivel","Categoría","Detalle"]],body:obsBody,
         theme:"grid",styles:{font:"helvetica",fontSize:8,cellPadding:4,lineColor:C.line,lineWidth:.3,valign:"top"},
         headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-        columnStyles:{0:{cellWidth:55},1:{cellWidth:100}},margin:{left:M,right:M},
+        columnStyles:{0:{cellWidth:55},1:{cellWidth:100}},margin:{top:HDR_H+14, left:M, right:M},
         didAddPage: function(){drawHeader(); pageNum++;}});
       y=doc.lastAutoTable.finalY+20;
     }
@@ -2129,7 +2144,7 @@ table.data tr.neg td.diff{color:var(--red)}
   function labelMotivo(m){return({renuncia:"Renuncia voluntaria",despido_sin_justa:"Despido sin justa causa",despido_con_justa:"Despido con justa causa",mutuo:"Mutuo acuerdo",vencimiento:"Vencimiento del término",obra_terminada:"Terminación de la obra",muerte:"Muerte del trabajador",abandono:"Abandono del cargo"})[m]||m;}
   function labelTipoSal(t){return({fijo:"Ordinario fijo",variable:"Ordinario variable",integral:"Integral"})[t]||t;}
   function labelMod(m){return({presencial:"Presencial",teletrabajo:"Teletrabajo",hibrido:"Híbrido"})[m]||m;}
-  function labelMod_rol(r){return({trabajador:"Para trabajador",empresa:"Para empleador"})[r]||"General";}
+
 </script>
 
 <!-- ============================================================

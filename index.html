@@ -2028,7 +2028,6 @@ function renderAd(id) {
      PDF GENERATION (Premium)
      ============================================================ -->
 <script id="pdf-js">
-  // Carga jsPDF bajo demanda (lazy) para no bloquear la carga inicial
   function cargarjsPDF() {
     return new Promise((resolve, reject) => {
       if (window.jspdf && window.jspdf.jsPDF) { resolve(); return; }
@@ -2041,286 +2040,457 @@ function renderAd(id) {
         s2.onerror = () => reject(new Error('No se pudo cargar jsPDF-AutoTable'));
         document.head.appendChild(s2);
       };
-      s1.onerror = () => reject(new Error('No se pudo cargar jsPDF. Verifique su conexión.'));
+      s1.onerror = () => reject(new Error('No se pudo cargar jsPDF'));
       document.head.appendChild(s1);
     });
   }
 
   async function generarPDF(calc, alertas, infoId) {
-    // Mostrar indicador de carga
     const btnPdf = document.getElementById('btn-pdf');
     const btnPdfMain = document.getElementById('btn-pdf-main');
-    const origText1 = btnPdf?.textContent, origText2 = btnPdfMain?.textContent;
-    if (btnPdf) { btnPdf.textContent = 'Cargando PDF…'; btnPdf.disabled = true; }
-    if (btnPdfMain) { btnPdfMain.textContent = 'Generando PDF…'; btnPdfMain.disabled = true; }
-
-    try {
-      await cargarjsPDF();
-    } catch(e) {
-      if (btnPdf) { btnPdf.textContent = origText1; btnPdf.disabled = false; }
-      if (btnPdfMain) { btnPdfMain.textContent = origText2; btnPdfMain.disabled = false; }
-      flashErr('No se pudo cargar el generador de PDF. Verifique su conexión a internet.');
+    const t1 = btnPdf?.textContent, t2 = btnPdfMain?.textContent;
+    if (btnPdf)    { btnPdf.textContent    = 'Generando…'; btnPdf.disabled    = true; }
+    if (btnPdfMain){ btnPdfMain.textContent = 'Generando…'; btnPdfMain.disabled = true; }
+    try { await cargarjsPDF(); }
+    catch(e) {
+      if (btnPdf)    { btnPdf.textContent    = t1; btnPdf.disabled    = false; }
+      if (btnPdfMain){ btnPdfMain.textContent = t2; btnPdfMain.disabled = false; }
+      flashErr('Sin conexión para generar PDF. Verifique internet e intente nuevamente.');
       return;
     }
+
+    /* ── SISTEMA DE DISEÑO ─────────────────────────────────── */
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation:"portrait", unit:"pt", format:"a4" });
-    const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
-    const M=40, CW=W-2*M;
-    const C = { brand:[12,58,94], brandMid:[30,92,142], accent:[196,127,23], text:[26,25,21],
-                muted:[138,131,123], line:[224,219,212], green:[26,107,74], red:[155,28,28],
-                bg:[246,244,240], white:[255,255,255] };
-    let y=0, pageNum=0;
+    const PW = doc.internal.pageSize.getWidth();   // 595.28
+    const PH = doc.internal.pageSize.getHeight();  // 841.89
+    const ML = 44, MR = 44, CW = PW - ML - MR;    // márgenes y ancho útil
 
-    const HDR_H = 58; // altura banda header
+    // Paleta unificada
+    const P = {
+      brand   : [12,  58,  94 ],   // #0c3a5e
+      brandB  : [6,   38,  66 ],   // más oscuro para detalles
+      accent  : [196, 127, 23 ],   // #c47f17
+      text    : [30,  29,  27 ],   // casi negro
+      sub     : [80,  77,  73 ],   // gris medio
+      muted   : [140, 134, 126],   // gris claro
+      line    : [216, 210, 202],   // borde
+      bg      : [248, 246, 243],   // fondo tabla / secciones
+      white   : [255, 255, 255],
+      green   : [22,  101, 70 ],
+      red     : [155, 28,  28 ],
+      greenBg : [232, 245, 238],
+      redBg   : [253, 235, 235],
+    };
 
-    // Función reutilizable — la llaman newPage() Y los hooks de autoTable
+    // Tipografía — tamaños únicos para cada nivel
+    const FS = { h1:16, h2:9.5, h3:8, body:8, small:7, micro:6.5 };
+
+    // Estado de paginación
+    let pageY = 0, pageNum = 0;
+    const HDR  = 54;   // altura header
+    const FTR  = 36;   // altura footer + línea
+    const SAFE = PH - FTR;  // límite inferior de contenido
+
+    /* ── PRIMITIVAS ────────────────────────────────────────── */
+
+    function p(family, style) { doc.setFont("helvetica", style || "normal"); }
+    function fs(size)  { doc.setFontSize(size); }
+    function fc(...rgb) { doc.setTextColor(...rgb); }
+    function fill(...rgb){ doc.setFillColor(...rgb); }
+    function stroke(...rgb){ doc.setDrawColor(...rgb); }
+    function lw(w){ doc.setLineWidth(w); }
+
+    // Escribir texto con helpers opcionales
+    function txt(str, x, y, opts) { doc.text(str, x, y, opts || {}); }
+
+    /* ── HEADER (dibujado en cada página) ──────────────────── */
     function drawHeader() {
-      doc.setFillColor(...C.brand);
-      doc.rect(0,0,W,HDR_H,"F");
+      // Banda completa
+      fill(...P.brand);
+      doc.rect(0, 0, PW, HDR, "F");
 
-      // ── Columna izquierda (x desde M, max hasta mitad de página) ──
-      doc.setFont("helvetica","bold");
-      doc.setFontSize(15);
-      doc.setTextColor(...C.white);
-      doc.text("LIQUIA", M, 20);
+      // Acento lateral izquierdo
+      fill(...P.accent);
+      doc.rect(0, 0, 4, HDR, "F");
 
-      doc.setFont("helvetica","normal");
-      doc.setFontSize(8);
-      doc.setTextColor(190,215,238);
-      doc.text("Calculadora de Liquidación Laboral en Colombia", M, 33);
+      // Logo tipo texto — LIQUIA
+      p("h","bold"); fs(FS.h1); fc(...P.white);
+      txt("LIQUIA", ML, 22);
 
-      doc.setFontSize(7);
-      doc.setTextColor(150,185,220);
-      doc.text("CST + Ley 2466/2025 + Decreto 0159/2026", M, 44);
+      // Subtítulo
+      p("h","normal"); fs(FS.small); fc(185, 213, 236);
+      txt("Calculadora de Liquidación Laboral en Colombia", ML, 34);
+      fs(FS.micro); fc(145, 182, 218);
+      txt("CST + Ley 2466/2025 + Decreto 0159/2026", ML, 44);
 
-      // ── Columna derecha (x = W−M, alineado derecha) ──
-      doc.setFont("helvetica","normal");
-      doc.setFontSize(7.5);
-      doc.setTextColor(200,225,242);
-      doc.text(infoId, W-M, 20, {align:"right"});
-
-      doc.setFontSize(7.5);
-      doc.text(`Generado: ${fmtDate(HOY)}`, W-M, 31, {align:"right"});
-
-      doc.setFontSize(7);
-      doc.setTextColor(150,185,220);
-      doc.text("No constituye asesoría jurídica · liquia.co", W-M, 44, {align:"right"});
+      // Columna derecha — ID y fecha
+      fs(FS.small); fc(195, 222, 240);
+      txt(infoId, PW - MR, 22, {align:"right"});
+      txt("Generado: " + fmtDate(HOY), PW - MR, 34, {align:"right"});
+      fs(FS.micro); fc(145, 182, 218);
+      txt("liquia.co", PW - MR, 44, {align:"right"});
     }
 
-    function newPage() {
-      if(pageNum>0) doc.addPage();
-      pageNum++;
-      drawHeader();
-      y = HDR_H + 12;
-    }
-
-    function checkPage(need=80) { if(y+need>H-60) newPage(); }
-
-    function sectionTitle(txt) {
-      checkPage(30);
-      doc.setFont("helvetica","bold");
-      doc.setFontSize(10);
-      doc.setTextColor(...C.brand);
-      doc.text(txt,M,y); y+=4;
-      doc.setDrawColor(...C.brandMid);
-      doc.setLineWidth(1.5);
-      doc.line(M,y,M+20,y); y+=12;
-      doc.setTextColor(...C.text);
-    }
-
-    function footer(pgTotal) {
-      for(let pageIdx=1;pageIdx<=pgTotal;pageIdx++){
-        doc.setPage(pageIdx);
-        const fY=H-28;
-        doc.setDrawColor(...C.line);
-        doc.setLineWidth(0.5);
-        doc.line(M,fY-8,W-M,fY-8);
-        doc.setFont("helvetica","normal");
-        doc.setFontSize(7.5);
-        doc.setTextColor(...C.muted);
-        doc.text("Liquia es de uso informativo. No constituye asesoría jurídica. Consulte un especialista ante dudas. · liquia.co",M,fY);
-        doc.text(`Pág. ${pageIdx} / ${pgTotal}`,W-M,fY,{align:"right"});
+    /* ── FOOTER (pasa en el loop final sobre todas las páginas) */
+    function drawFooters(total) {
+      for (let i = 1; i <= total; i++) {
+        doc.setPage(i);
+        const fy = PH - 22;
+        stroke(...P.line); lw(0.5);
+        doc.line(ML, fy - 10, PW - MR, fy - 10);
+        p("h","normal"); fs(FS.micro); fc(...P.muted);
+        txt("Liquia es de uso informativo · No constituye asesoría jurídica · Consulte un especialista", ML, fy);
+        txt(`${i} / ${total}`, PW - MR, fy, {align:"right"});
       }
     }
 
-    const d=S.datos;
+    /* ── NUEVA PÁGINA ──────────────────────────────────────── */
+    function newPage() {
+      if (pageNum > 0) doc.addPage();
+      pageNum++;
+      drawHeader();
+      pageY = HDR + 18;
+    }
+
+    /* ── VERIFICAR ESPACIO ─────────────────────────────────── */
+    function need(h) { if (pageY + h > SAFE) newPage(); }
+
+    /* ── TÍTULO DE SECCIÓN ─────────────────────────────────── */
+    function secTitle(label) {
+      need(28);
+      // Barra lateral de acento
+      fill(...P.accent);
+      doc.rect(ML, pageY, 3, 16, "F");
+      // Número y texto
+      p("h","bold"); fs(FS.h2); fc(...P.brand);
+      txt(label, ML + 10, pageY + 11);
+      pageY += 24;
+      fc(...P.text);
+    }
+
+    /* ── TABLA UNIFICADA ───────────────────────────────────── */
+    // Configuración base compartida por todas las tablas del documento
+    function tableBase(extra) {
+      return Object.assign({
+        theme: "grid",
+        styles: {
+          font: "helvetica",
+          fontSize: FS.body,
+          cellPadding: { top:5, right:6, bottom:6, left:6 },
+          lineColor: P.line,
+          lineWidth: 0.3,
+          textColor: P.text,
+          valign: "top",
+          overflow: "linebreak",
+        },
+        headStyles: {
+          fillColor: P.brand,
+          textColor: P.white,
+          fontStyle: "bold",
+          fontSize: FS.body,
+          cellPadding: { top:5, right:6, bottom:5, left:6 },
+        },
+        alternateRowStyles: { fillColor: P.bg },
+        margin: { top: HDR + 16, left: ML, right: MR },
+        rowPageBreak: "avoid",
+        didAddPage: function() { drawHeader(); pageNum++; },
+      }, extra || {});
+    }
+
+    /* ── CAJA DESTACADA (total, diff) ──────────────────────── */
+    function calloutBox(opts) {
+      // opts: { fillColor, strokeColor, h, label, labelColor, value, valueColor, subLabel, subColor }
+      need(opts.h || 52);
+      const bx = ML, by = pageY, bw = CW, bh = opts.h || 52, br = 5;
+      fill(...opts.fillColor);
+      doc.roundedRect(bx, by, bw, bh, br, br, "F");
+      if (opts.strokeColor) {
+        stroke(...opts.strokeColor); lw(0.8);
+        doc.roundedRect(bx, by, bw, bh, br, br, "D");
+      }
+      // Acento vertical izquierdo
+      if (opts.accentColor) {
+        fill(...opts.accentColor);
+        doc.roundedRect(bx, by, 4, bh, br, br, "F");
+        doc.rect(bx + 2, by, 2, bh, "F"); // square off right side of accent
+      }
+      p("h","normal"); fs(FS.small); fc(...(opts.labelColor || P.sub));
+      txt(opts.label, bx + 14, by + 16);
+      p("h","bold"); fs(opts.valueFontSize || 18); fc(...(opts.valueColor || P.text));
+      txt(opts.value, PW - MR - 12, by + (opts.h || 52) * 0.65, {align:"right"});
+      if (opts.subLabel) {
+        p("h","normal"); fs(FS.micro); fc(...(opts.subColor || P.muted));
+        txt(opts.subLabel, bx + 14, by + (opts.h || 52) - 10);
+      }
+      pageY += (opts.h || 52) + 14;
+    }
+
+    /* ── COMPOSICIÓN DEL DOCUMENTO ─────────────────────────── */
+    const d = S.datos;
     newPage();
 
-    // ── Datos generales ──────────────────────────────
-    sectionTitle("1. Datos del contrato");
-    const datosRows=[
-      ["Tipo de contrato", labelContrato(d.tipoContrato)],
-      ["Motivo de terminación", labelMotivo(d.motivoTerminacion)],
-      ["Fecha de ingreso", fmtDate(d.fechaIngreso)],
-      ["Fecha de terminación", fmtDate(d.fechaTerminacion)],
-      ["Tiempo de servicio", tiempoHumano(calc.dias) + ` (${calc.dias} días comerciales · ${calc.diasCal} calendario)`],
-      ["Tipo de salario", labelTipoSal(d.tipoSalario)],
-      ["Modalidad laboral", labelMod(d.modalidadLaboral)],
-      ["Salario mensual base", fmtCOP(calc.base.baseSinAux)],
-      [`${calc.base.tipoAux}`, calc.base.aplica ? fmtCOP(calc.base.auxMensual)+" (aplica)" : "No aplica"],
-      ["Base con auxilio (para prestaciones)", fmtCOP(calc.base.baseConAux)],
-      ["Salario diario", fmtCOP(calc.salDiario)],
-      ["Período de prueba", d.periodoPrueba?"Sí":"No"],
-      ["Fuero o estabilidad reforzada", d.fueroEspecial?"Sí":"No"],
+    // ┌─────────────────────────────────────────────────────┐
+    // │  SECCIÓN 1 — DATOS DEL CONTRATO                     │
+    // └─────────────────────────────────────────────────────┘
+    secTitle("1. Datos del contrato");
+
+    const datosRows = [
+      ["Tipo de contrato",              labelContrato(d.tipoContrato)],
+      ["Motivo de terminación",         labelMotivo(d.motivoTerminacion)],
+      ["Modalidad laboral",             labelMod(d.modalidadLaboral)],
+      ["Fecha de ingreso",              fmtDate(d.fechaIngreso)],
+      ["Fecha de terminación",          fmtDate(d.fechaTerminacion)],
+      ["Tiempo de servicio",            tiempoHumano(calc.dias) + `  (${calc.dias} días comerciales · ${calc.diasCal} calendario)`],
+      ["Tipo de salario",               labelTipoSal(d.tipoSalario)],
+      ["Salario mensual base",          fmtCOP(calc.base.baseSinAux)],
+      [calc.base.tipoAux,               calc.base.aplica ? fmtCOP(calc.base.auxMensual) + " (aplica)" : "No aplica"],
+      ["Base para prestaciones",        fmtCOP(calc.base.baseConAux)],
+      ["Período de prueba",             d.periodoPrueba ? "Sí" : "No"],
+      ["Fuero o estabilidad reforzada", d.fueroEspecial  ? "Sí" : "No"],
     ];
-    doc.autoTable({startY:y, head:[["Campo","Valor"]], body:datosRows,
-      theme:"grid", styles:{font:"helvetica",fontSize:8.5,cellPadding:5,lineColor:C.line,lineWidth:.3},
-      headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-      columnStyles:{0:{cellWidth:200},1:{halign:"left"}}, margin:{top:HDR_H+14, left:M, right:M},
-      didAddPage: function(){drawHeader(); pageNum++;}});
-    y=doc.lastAutoTable.finalY+20;
 
-    // ── Liquidación según norma ──────────────────────
-    checkPage(100);
-    sectionTitle("2. Liquidación según la ley");
+    doc.autoTable(tableBase({
+      startY: pageY,
+      head: [["Campo", "Valor"]],
+      body: datosRows,
+      columnStyles: {
+        0: { cellWidth: 185, fontStyle:"bold", textColor: P.sub  },
+        1: { halign:"left" },
+      },
+    }));
+    pageY = doc.lastAutoTable.finalY + 22;
 
-    doc.setFillColor(...C.brand);
-    doc.roundedRect(M,y,CW,44,4,4,"F");
-    doc.setFont("helvetica","bold");
-    doc.setFontSize(10);
-    doc.setTextColor(...C.white);
-    doc.text("TOTAL LIQUIDACIÓN SEGÚN LA LEY",M+12,y+16);
-    doc.setFont("helvetica","bold");
-    doc.setFontSize(16);
-    doc.text(fmtCOP(calc.total),W-M-12,y+28,{align:"right"});
-    doc.setFont("helvetica","normal");
-    doc.setFontSize(8);
-    doc.setTextColor(180,210,240);
-    doc.text(`${calc.lineas.filter(l=>l.aplica).length} conceptos · ${calc.dias} días`,M+12,y+32);
-    y+=56;
+    // ┌─────────────────────────────────────────────────────┐
+    // │  SECCIÓN 2 — LIQUIDACIÓN SEGÚN LA LEY              │
+    // └─────────────────────────────────────────────────────┘
+    need(120);
+    secTitle("2. Liquidación según la ley");
 
-    const normaBody=calc.lineas.filter(l=>l.aplica).map(l=>[
-      // Col 0: nombre + referencia normativa
-      {content:`${l.concepto}\n${l.ref}`, styles:{fontStyle:"bold", overflow:"linebreak"}},
-      // Col 1: fórmula + variables + nota (separación con \n explícita evita fusión visual)
-      {content:[l.formula, l.vars, l.nota||null].filter(Boolean).join("\n"),
-       styles:{textColor:[100,95,90], fontSize:8, overflow:"linebreak"}},
-      // Col 2: valor — alineado a la derecha
-      {content:fmtCOP(l.v), styles:{halign:"right", fontStyle:"bold", overflow:"linebreak"}}
+    // Caja total premium
+    calloutBox({
+      h: 58,
+      fillColor: P.brand,
+      accentColor: P.accent,
+      label: "TOTAL LIQUIDACIÓN SEGÚN LA LEY",
+      labelColor: [185, 213, 236],
+      value: fmtCOP(calc.total),
+      valueFontSize: 20,
+      valueColor: P.white,
+      subLabel: `${calc.lineas.filter(l=>l.aplica).length} conceptos · ${calc.dias} días comerciales · ${tiempoHumano(calc.dias)}`,
+      subColor: [145, 182, 218],
+    });
+
+    // Tabla de desglose
+    const normaBody = calc.lineas.filter(l => l.aplica).map(l => [
+      { content: `${l.concepto}\n${l.ref}`,
+        styles: { fontStyle:"bold", textColor: P.brand }},
+      { content: [l.formula, l.vars, l.nota || null].filter(Boolean).join("\n"),
+        styles: { textColor: P.sub, fontSize: FS.small }},
+      { content: fmtCOP(l.v),
+        styles: { halign:"right", fontStyle:"bold" }},
     ]);
     normaBody.push([
-      {content:"TOTAL", styles:{fontStyle:"bold", fillColor:C.bg}},
-      {content:"",      styles:{fillColor:C.bg}},
-      {content:fmtCOP(calc.total), styles:{fontStyle:"bold", halign:"right", fillColor:C.bg}}
+      { content:"TOTAL", styles:{ fontStyle:"bold", fillColor: P.bg, textColor: P.brand }},
+      { content:"",      styles:{ fillColor: P.bg }},
+      { content: fmtCOP(calc.total),
+        styles: { halign:"right", fontStyle:"bold", fillColor: P.bg, textColor: P.brand }},
     ]);
-    doc.autoTable({
-      startY:y,
-      head:[["Concepto / Norma","Fórmula y variables","Valor"]],
-      body:normaBody,
-      theme:"grid",
-      styles:{
-        font:"helvetica", fontSize:8,
-        cellPadding:{top:6, right:6, bottom:7, left:6},
-        lineColor:C.line, lineWidth:.4,
+
+    doc.autoTable(tableBase({
+      startY: pageY,
+      head: [["Concepto / Norma", "Fórmula y variables", "Valor"]],
+      body: normaBody,
+      styles: {
+        font:"helvetica", fontSize: FS.body,
+        cellPadding: { top:6, right:6, bottom:7, left:6 },
+        lineColor: P.line, lineWidth: 0.3,
         valign:"top", overflow:"linebreak",
-        minCellHeight:28           // evita que celdas muy cortas colapsen con la siguiente
+        minCellHeight: 26,
       },
-      headStyles:{fillColor:C.bg, textColor:C.text, fontStyle:"bold", fontSize:8.5},
-      columnStyles:{
-        0:{cellWidth:138, overflow:"linebreak"},
-        1:{cellWidth:245, overflow:"linebreak"},
-        2:{cellWidth:90,  halign:"right", overflow:"linebreak"}
+      headStyles: {
+        fillColor: P.brand, textColor: P.white,
+        fontStyle:"bold", fontSize: FS.body,
+        cellPadding: { top:5, right:6, bottom:5, left:6 },
       },
-      rowPageBreak:"avoid",        // intenta no cortar filas entre páginas
-      margin:{top:HDR_H+14, left:M, right:M},
-      didAddPage: function(){drawHeader(); pageNum++;}
-    });
-    y=doc.lastAutoTable.finalY+20;
+      columnStyles: {
+        0: { cellWidth: 145 },
+        1: { cellWidth: 240 },
+        2: { cellWidth: 88,  halign:"right" },
+      },
+    }));
+    pageY = doc.lastAutoTable.finalY + 22;
 
-    // ── Empresa ──────────────────────────────────────
-    const tEmp=Object.values(d.empresaConceptos||{}).reduce((s,v)=>s+(Number(v)||0),0);
-    const tieneEmp=tEmp>0;
-    if(tieneEmp){
-      checkPage(120);
-      sectionTitle("3. Propuesta de la empresa");
-      const diff=tEmp-calc.total;
-      const empBody=EMP_MAP.map(m=>{
-        const v=Number(d.empresaConceptos[m.empF]||0);
-        return [m.lbl, v>0?fmtCOP(v):"—"];
+    // ┌─────────────────────────────────────────────────────┐
+    // │  SECCIÓN 3 — PROPUESTA DE EMPRESA (si aplica)       │
+    // └─────────────────────────────────────────────────────┘
+    const tEmp = Object.values(d.empresaConceptos || {}).reduce((s,v) => s + (Number(v)||0), 0);
+    const tieneEmp = tEmp > 0;
+
+    if (tieneEmp) {
+      need(120);
+      secTitle("3. Propuesta de la empresa");
+
+      const diff = tEmp - calc.total;
+      const pct  = calc.total > 0 ? Math.abs(diff / calc.total) * 100 : 0;
+      const esDesfav = diff < 0;
+
+      const empBody = EMP_MAP.map(m => {
+        const v = Number(d.empresaConceptos[m.empF] || 0);
+        return [m.lbl, v > 0 ? fmtCOP(v) : "—"];
       });
-      empBody.push([{content:"TOTAL",styles:{fontStyle:"bold"}},{content:fmtCOP(tEmp),styles:{fontStyle:"bold",halign:"right"}}]);
-      doc.autoTable({startY:y,head:[["Concepto","Valor empresa"]],body:empBody,
-        theme:"grid",styles:{font:"helvetica",fontSize:9,cellPadding:5,lineColor:C.line,lineWidth:.3},
-        headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-        columnStyles:{0:{cellWidth:220},1:{halign:"right"}},margin:{top:HDR_H+14, left:M, right:M},
-        didAddPage: function(){drawHeader(); pageNum++;}});
-      y=doc.lastAutoTable.finalY+14;
-
-        doc.setFillColor(diff<0?250:240,diff<0?235:248,diff<0?235:244);
-      doc.setDrawColor(...(diff<0?C.red:C.green));
-      doc.roundedRect(M,y,CW,40,4,4,"FD");
-      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...(diff<0?C.red:C.green));
-      doc.text(diff<0?"Diferencia (empresa paga MENOS)":"Diferencia (empresa paga más / igual)",M+12,y+14);
-      doc.setFontSize(14);
-      doc.text((diff>=0?"+":"")+fmtCOP(diff),W-M-12,y+26,{align:"right"});
-      doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...C.muted);
-      const pct=calc.total>0?Math.abs(diff/calc.total)*100:0;
-      doc.text(`${pct.toFixed(1)}% de diferencia en valor absoluto`,M+12,y+28);
-      y+=52;
-
-        checkPage(100);
-      const cmpBody=EMP_MAP.map(m=>{
-        const norma=m.normaKeys.reduce((s,k)=>{const l=calc.lineas.find(x=>x.key===k);return s+(l&&l.aplica?l.v:0);},0);
-        const emp=Number(d.empresaConceptos[m.empF]||0);
-        const df=emp-norma;
-        return [m.lbl,fmtCOP(norma),fmtCOP(emp),(df>=0?"+":"")+fmtCOP(df),
-          norma===0&&emp===0?"—":((df>=0?"+":"")+(df/norma*100||0).toFixed(1)+"%")];
-      });
-      cmpBody.push([{content:"TOTAL",styles:{fontStyle:"bold"}},{content:fmtCOP(calc.total),styles:{fontStyle:"bold",halign:"right"}},
-        {content:fmtCOP(tEmp),styles:{fontStyle:"bold",halign:"right"}},
-        {content:(diff>=0?"+":"")+fmtCOP(diff),styles:{fontStyle:"bold",halign:"right"}},
-        {content:calc.total>0?((diff/calc.total)*100).toFixed(2)+"%":"—",styles:{fontStyle:"bold",halign:"right"}}]);
-      doc.autoTable({startY:y,head:[["Concepto","Norma","Empresa","Diferencia","Δ %"]],body:cmpBody,
-        theme:"grid",styles:{font:"helvetica",fontSize:8.5,cellPadding:4,lineColor:C.line,lineWidth:.3},
-        headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-        columnStyles:{0:{cellWidth:130},1:{halign:"right"},2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}},
-        margin:{top:HDR_H+14, left:M, right:M}, didAddPage: function(){drawHeader(); pageNum++;}});
-      y=doc.lastAutoTable.finalY+20;
-    }
-
-    // ── Alertas ──────────────────────────────────────
-    const secN = tieneEmp?"4":"3";
-    checkPage(60);
-    sectionTitle(`${secN}. Observaciones técnicas`);
-    if(!alertas.length){
-      doc.setFont("helvetica","italic"); doc.setFontSize(9); doc.setTextColor(...C.muted);
-      doc.text("No se detectaron observaciones automáticas.",M,y); y+=18;
-    } else {
-      const obsBody=alertas.map(a=>[
-        a.sev==="critical"?"CRÍTICO":a.sev==="info"?"INFO":"ADVERTENCIA",
-        a.tag, a.txt
+      empBody.push([
+        { content:"TOTAL", styles:{fontStyle:"bold", textColor: P.brand}},
+        { content: fmtCOP(tEmp), styles:{fontStyle:"bold", halign:"right", textColor: P.brand}},
       ]);
-      doc.autoTable({startY:y,head:[["Nivel","Categoría","Detalle"]],body:obsBody,
-        theme:"grid",styles:{font:"helvetica",fontSize:8,cellPadding:4,lineColor:C.line,lineWidth:.3,valign:"top"},
-        headStyles:{fillColor:C.bg,textColor:C.text,fontStyle:"bold"},
-        columnStyles:{0:{cellWidth:55},1:{cellWidth:100}},margin:{top:HDR_H+14, left:M, right:M},
-        didAddPage: function(){drawHeader(); pageNum++;}});
-      y=doc.lastAutoTable.finalY+20;
+
+      doc.autoTable(tableBase({
+        startY: pageY,
+        head: [["Concepto", "Valor empresa"]],
+        body: empBody,
+        columnStyles: {
+          0: { cellWidth: 280 },
+          1: { halign:"right" },
+        },
+      }));
+      pageY = doc.lastAutoTable.finalY + 16;
+
+      // Caja diferencia
+      calloutBox({
+        h: 52,
+        fillColor: esDesfav ? P.redBg : P.greenBg,
+        strokeColor: esDesfav ? P.red : P.green,
+        accentColor: esDesfav ? P.red : P.green,
+        label: esDesfav
+          ? "La empresa propone MENOS de lo que corresponde por ley"
+          : "La empresa propone igual o MÁS de lo que corresponde",
+        labelColor: esDesfav ? P.red : P.green,
+        value: (diff >= 0 ? "+" : "") + fmtCOP(diff),
+        valueFontSize: 16,
+        valueColor: esDesfav ? P.red : P.green,
+        subLabel: `Diferencia en valor absoluto: ${pct.toFixed(1)}%`,
+        subColor: P.muted,
+      });
+
+      // Tabla comparativa
+      need(100);
+      const cmpBody = EMP_MAP.map(m => {
+        const norma = m.normaKeys.reduce((s,k) => {
+          const l = calc.lineas.find(x => x.key === k);
+          return s + (l && l.aplica ? l.v : 0);
+        }, 0);
+        const emp = Number(d.empresaConceptos[m.empF] || 0);
+        const df  = emp - norma;
+        const dPct = norma > 0 ? ((df / norma) * 100).toFixed(1) + "%" : "—";
+        return [
+          m.lbl,
+          { content: fmtCOP(norma), styles:{halign:"right"} },
+          { content: fmtCOP(emp),   styles:{halign:"right"} },
+          { content: (df >= 0 ? "+" : "") + fmtCOP(df),
+            styles:{ halign:"right", textColor: df < 0 ? P.red : df > 0 ? P.green : P.text } },
+          { content: dPct, styles:{halign:"right"} },
+        ];
+      });
+      cmpBody.push([
+        { content:"TOTAL", styles:{fontStyle:"bold", textColor: P.brand}},
+        { content: fmtCOP(calc.total),    styles:{fontStyle:"bold", halign:"right", textColor: P.brand}},
+        { content: fmtCOP(tEmp),          styles:{fontStyle:"bold", halign:"right", textColor: P.brand}},
+        { content: (diff>=0?"+":"") + fmtCOP(diff),
+          styles:{fontStyle:"bold", halign:"right", textColor: esDesfav ? P.red : P.green}},
+        { content: pct.toFixed(1)+"%",
+          styles:{fontStyle:"bold", halign:"right"}},
+      ]);
+
+      doc.autoTable(tableBase({
+        startY: pageY,
+        head: [["Concepto", "Norma", "Empresa", "Diferencia", "Δ %"]],
+        body: cmpBody,
+        columnStyles: {
+          0: { cellWidth: 140 },
+          1: { cellWidth: 82, halign:"right" },
+          2: { cellWidth: 82, halign:"right" },
+          3: { cellWidth: 94, halign:"right" },
+          4: { cellWidth: 55, halign:"right" },
+        },
+      }));
+      pageY = doc.lastAutoTable.finalY + 22;
     }
 
-    // ── Recomendaciones ──────────────────────────────
-    const secM = tieneEmp?"5":"4";
-    checkPage(80);
-    sectionTitle(`${secM}. Recomendaciones de acción`);
-    const recos=[
-      "Solicite el desglose por escrito al empleador. Cada concepto debe poder explicarse con su fórmula, base salarial y artículo del CST.",
-      "Conserve el contrato firmado, los desprendibles de nómina de los últimos 12 meses y toda comunicación sobre la terminación.",
-      "Si la diferencia supera el 5%, considere consultar a un abogado laboralista o acudir al Ministerio de Trabajo antes de firmar.",
-      "Las acciones laborales prescriben a los 3 años contados desde la exigibilidad (Art. 488 CST). No deje pasar tiempo si hay diferencias.",
-      "Ministerio de Trabajo Colombia: www.mintrabajo.gov.co · Línea gratuita: 01 8000 11 3380 · Generado con Liquia (liquia.co)",
+    // ┌─────────────────────────────────────────────────────┐
+    // │  SECCIÓN 3/4 — OBSERVACIONES TÉCNICAS              │
+    // └─────────────────────────────────────────────────────┘
+    const nObs = tieneEmp ? "4" : "3";
+    need(40);
+    secTitle(`${nObs}. Observaciones técnicas`);
+
+    if (!alertas.length) {
+      need(20);
+      p("h","italic"); fs(FS.body); fc(...P.muted);
+      txt("No se detectaron observaciones automáticas.", ML + 10, pageY);
+      pageY += 20;
+    } else {
+      const sevLabel = { critical:"CRÍTICO", warn:"ALERTA", info:"INFO" };
+      const sevColor = { critical: P.red, warn: P.accent, info: P.brand };
+      const obsBody = alertas.map(a => [
+        { content: sevLabel[a.sev] || a.sev,
+          styles: { fontStyle:"bold", textColor: sevColor[a.sev] || P.sub, fontSize: FS.small }},
+        { content: a.tag,  styles: { fontStyle:"bold" }},
+        { content: a.txt,  styles: { textColor: P.sub }},
+      ]);
+      doc.autoTable(tableBase({
+        startY: pageY,
+        head: [["Nivel", "Categoría", "Detalle"]],
+        body: obsBody,
+        columnStyles: {
+          0: { cellWidth: 55  },
+          1: { cellWidth: 110 },
+          2: { cellWidth: CW - 55 - 110 },
+        },
+      }));
+      pageY = doc.lastAutoTable.finalY + 22;
+    }
+
+    // ┌─────────────────────────────────────────────────────┐
+    // │  SECCIÓN 4/5 — RECOMENDACIONES                     │
+    // └─────────────────────────────────────────────────────┘
+    const nRec = tieneEmp ? "5" : "4";
+    need(60);
+    secTitle(`${nRec}. Recomendaciones`);
+
+    const recos = [
+      ["Desglose por escrito",   "Solicite al empleador el detalle de cada concepto con su fórmula, base salarial y artículo del CST que lo sustenta."],
+      ["Conserve documentos",    "Guarde el contrato firmado, desprendibles de nómina de los últimos 12 meses y toda comunicación sobre la terminación."],
+      ["Consulta profesional",   "Si la diferencia supera el 5%, consulte a un abogado laboralista o acuda al Ministerio de Trabajo antes de firmar."],
+      ["Prescripción",           "Las acciones laborales prescriben a los 3 años desde la exigibilidad (Art. 488 CST). No deje pasar el tiempo."],
+      ["Contacto institucional", "Ministerio de Trabajo: www.mintrabajo.gov.co · Línea gratuita: 01 8000 11 3380"],
     ];
-    doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...C.text);
-    recos.forEach((r,i)=>{
-      checkPage(28);
-      const t=doc.splitTextToSize(`${i+1}. ${r}`, CW-16);
-      doc.text(t,M+8,y); y+=t.length*12+5;
+
+    recos.forEach(([titulo, texto], i) => {
+      need(30);
+      // Número circular
+      const rx = ML + 8, ry = pageY;
+      fill(...P.brand);
+      doc.circle(rx, ry + 4, 6, "F");
+      p("h","bold"); fs(FS.micro); fc(...P.white);
+      txt(String(i+1), rx, ry + 7, {align:"center"});
+      // Título
+      p("h","bold"); fs(FS.body); fc(...P.brand);
+      txt(titulo, ML + 20, ry + 5);
+      // Cuerpo
+      p("h","normal"); fs(FS.small); fc(...P.sub);
+      const lines = doc.splitTextToSize(texto, CW - 22);
+      txt(lines, ML + 20, ry + 15);
+      pageY += lines.length * 11 + 14;
     });
 
-    footer(doc.internal.getNumberOfPages());
+    // ┌─────────────────────────────────────────────────────┐
+    // │  FOOTERS EN TODAS LAS PÁGINAS                       │
+    // └─────────────────────────────────────────────────────┘
+    drawFooters(doc.internal.getNumberOfPages());
     doc.save(`liquia_liquidacion_${infoId}.pdf`);
 
-    if (btnPdf) { btnPdf.textContent = origText1; btnPdf.disabled = false; }
-    if (btnPdfMain) { btnPdfMain.textContent = origText2; btnPdfMain.disabled = false; }
+    if (btnPdf)    { btnPdf.textContent    = t1; btnPdf.disabled    = false; }
+    if (btnPdfMain){ btnPdfMain.textContent = t2; btnPdfMain.disabled = false; }
   }
 
   function labelContrato(c){return({indefinido:"Término indefinido",fijo:"Término fijo",obra:"Obra o labor",aprendizaje:"Aprendizaje SENA",domestico:"Servicio doméstico"})[c]||c;}

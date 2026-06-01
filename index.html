@@ -146,8 +146,6 @@ img{max-width:100%;height:auto}
 .fw-600{font-weight:600} .fw-700{font-weight:700}
 
 /* ---- Containers ---- */
-.container{max-width:860px;width:100%;margin:0 auto;padding:0 20px}
-@media(min-width:600px){.container{padding:0 28px}}
 
 /* ---- Cards ---- */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh)}
@@ -170,7 +168,7 @@ img{max-width:100%;height:auto}
 .btn-ghost:hover{background:#f0ede8}
 .btn-lg{padding:15px 28px;font-size:16px;min-height:52px;border-radius:var(--r)}
 .btn-sm{padding:8px 14px;font-size:13px;min-height:38px}
-.btn-block{width:100%}
+
 .btn:disabled{opacity:.45;pointer-events:none}
 .btn-danger{background:var(--red-bg);color:var(--red);border-color:#f8c8c8}
 
@@ -225,7 +223,6 @@ input.err,select.err{border-color:var(--red)}
 
 /* ---- Info box ---- */
 
-
 /* ---- Disclaimer ---- */
 
 .band{border-radius:var(--r);padding:16px 18px;border:1px solid;display:flex;gap:14px;align-items:flex-start}
@@ -259,7 +256,6 @@ input.err,select.err{border-color:var(--red)}
 
 /* ---- Difference bands ---- */
 
-
 /* ---- Tables ---- */
 table.data{width:100%;border-collapse:collapse;font-size:14px}
 table.data th,table.data td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
@@ -276,20 +272,16 @@ table.data tr.neg td.diff{color:var(--red)}
   padding:3px 9px;border-radius:99px;background:var(--brand-light);
   color:var(--brand-mid);border:1px solid #c5ddf0;font-weight:500
 }
-.pill-amber{background:var(--accent-light);color:var(--accent-dark);border-color:#e8c36a}
-.pill-green{background:var(--green-bg);color:var(--green);border-color:#a8d9bf}
-.pill-red{background:var(--red-bg);color:var(--red);border-color:#f0b8b8}
 
 /* ---- Divider ---- */
 .divider{height:1px;background:var(--border);margin:20px 0}
-.divider-sm{height:1px;background:var(--border);margin:12px 0}
 
 /* ---- Stack / Row helpers ---- */
 .stack{display:flex;flex-direction:column}
 .gap-4{gap:4px}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-20{gap:20px}.gap-24{gap:24px}
 .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .row-between{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.mt-4{margin-top:4px}.mt-8{margin-top:8px}.mt-12{margin-top:12px}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}
 .mt-16{margin-top:16px}.mt-20{margin-top:20px}.mt-24{margin-top:24px}
 .mb-4{margin-bottom:4px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}
 .mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-24{margin-bottom:24px}
@@ -416,7 +408,7 @@ table.data tr.neg td.diff{color:var(--red)}
 .step-num{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
 
 /* Step card */
-.step-card{margin-bottom:0}
+
 .step-header{margin-bottom:24px}
 .step-header h2{font-size:22px;color:var(--text);margin-bottom:6px}
 .step-header p{font-size:14px;color:var(--muted)}
@@ -535,7 +527,6 @@ table.data tr.neg td.diff{color:var(--red)}
       <p style="color:#6b7280;line-height:1.6;">Por favor habilite JavaScript en su navegador para usar la calculadora de liquidación laboral.</p>
     </div>
   </noscript>
-  <!-- HEADER -->
   <header class="app-header">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true"></div>
@@ -547,7 +538,6 @@ table.data tr.neg td.diff{color:var(--red)}
     <div class="header-norm" id="header-date"></div>
   </header>
 
-  <!-- MAIN -->
   <main class="main" id="main">
     <section id="screen-landing"  class="screen"></section>
     <section id="screen-rol"      class="screen"></section>
@@ -555,7 +545,6 @@ table.data tr.neg td.diff{color:var(--red)}
     <section id="screen-resultado" class="screen"></section>
   </main>
 
-  <!-- FOOTER -->
   <footer class="app-footer">
     <!-- Ad Slot 6: Footer -->
     <div id="ad-footer-wrap" style="max-width:728px;margin:0 auto 16px;"></div>
@@ -1074,7 +1063,7 @@ function renderAd(id) {
   const ROL = {
     trabajador: {
       label: "Trabajador",
-      heroSub: "Verifica que tu liquidación sea exactamente lo que la ley te garantiza.",
+  
       ctaLabel: "Calcular lo que me corresponde →",
       wizardTitle: "Cálculo de tu liquidación",
       s1title: "Datos de tu contrato",
@@ -1090,11 +1079,10 @@ function renderAd(id) {
       resTitle: "Lo que te corresponde según la ley",
       resLead: "Liquidación según norma · Resultado para trabajador",
       empPrompt: "¿Tienes la liquidación que te propuso tu empresa? Compara aquí",
-      pdfSubtitle: "Informe de Liquidación · Para trabajador",
     },
     empresa: {
       label: "Empleador",
-      heroSub: "Reconstruye la liquidación de un trabajador correctamente antes de pagarla.",
+  
       ctaLabel: "Calcular la liquidación a pagar →",
       wizardTitle: "Cálculo de liquidación laboral",
       s1title: "Datos del contrato",
@@ -1110,7 +1098,6 @@ function renderAd(id) {
       resTitle: "Liquidación según la ley a pagar",
       resLead: "Liquidación calculada · Para empleador",
       empPrompt: "¿Quieres ingresar lo que ya propusiste pagar? Compara aquí",
-      pdfSubtitle: "Informe de Liquidación · Para empleador",
     },
   };
   function t(key) { return (ROL[S.rol] || ROL.trabajador)[key]; }
@@ -1359,7 +1346,6 @@ function renderAd(id) {
     </div>
     `;
 
-    // wire step pills
     el.querySelectorAll("[data-s]").forEach(p=>{
       p.addEventListener("click",()=>{
         const n=Number(p.dataset.s);
@@ -2004,18 +1990,15 @@ function renderAd(id) {
       </div>
     </div>`;
 
-    // Events
     document.getElementById("btn-edit")?.addEventListener("click",()=>{ S.step=1; save(); renderWizard(); goTo("wizard"); });
     [document.getElementById("btn-pdf"), document.getElementById("btn-pdf-main")].forEach(b=>b?.addEventListener("click",()=>generarPDF(calc,alertas,infoId)));
     document.getElementById("btn-reset")?.addEventListener("click",()=>{
       if(confirm("¿Borrar todos los datos y empezar un cálculo nuevo?")){ reset(); window._iid=null; renderLanding(); renderRol(); goTo("landing"); }
     });
-    // Accordion
     document.querySelectorAll(".bd-header").forEach(h=>{
       if(h.style.cursor==="default") return;
       h.addEventListener("click",()=>h.closest(".bd-row")?.classList.toggle("open"));
     });
-    // Empresa toggle
     document.getElementById("emp-trigger")?.addEventListener("click",()=>{
       const body=document.getElementById("emp-body");
       const arrow=document.getElementById("emp-arrow");
@@ -2191,7 +2174,6 @@ function renderAd(id) {
     checkPage(100);
     sectionTitle("2. Liquidación según la ley");
 
-    // Total highlight box
     doc.setFillColor(...C.brand);
     doc.roundedRect(M,y,CW,44,4,4,"F");
     doc.setFont("helvetica","bold");
@@ -2213,13 +2195,13 @@ function renderAd(id) {
       // Col 1: fórmula + variables + nota (separación con \n explícita evita fusión visual)
       {content:[l.formula, l.vars, l.nota||null].filter(Boolean).join("\n"),
        styles:{textColor:[100,95,90], fontSize:8, overflow:"linebreak"}},
-      // Col 2: valor — prefijo \u200E (LTR mark) garantiza orden correcto en extracción PDF
-      {content:"\u200E"+fmtCOP(l.v), styles:{halign:"right", fontStyle:"bold", overflow:"linebreak"}}
+      // Col 2: valor — alineado a la derecha
+      {content:fmtCOP(l.v), styles:{halign:"right", fontStyle:"bold", overflow:"linebreak"}}
     ]);
     normaBody.push([
       {content:"TOTAL", styles:{fontStyle:"bold", fillColor:C.bg}},
       {content:"",      styles:{fillColor:C.bg}},
-      {content:"\u200E"+fmtCOP(calc.total), styles:{fontStyle:"bold", halign:"right", fillColor:C.bg}}
+      {content:fmtCOP(calc.total), styles:{fontStyle:"bold", halign:"right", fillColor:C.bg}}
     ]);
     doc.autoTable({
       startY:y,
@@ -2264,8 +2246,7 @@ function renderAd(id) {
         didAddPage: function(){drawHeader(); pageNum++;}});
       y=doc.lastAutoTable.finalY+14;
 
-      // Diff box
-      doc.setFillColor(diff<0?250:240,diff<0?235:248,diff<0?235:244);
+        doc.setFillColor(diff<0?250:240,diff<0?235:248,diff<0?235:244);
       doc.setDrawColor(...(diff<0?C.red:C.green));
       doc.roundedRect(M,y,CW,40,4,4,"FD");
       doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...(diff<0?C.red:C.green));
@@ -2277,8 +2258,7 @@ function renderAd(id) {
       doc.text(`${pct.toFixed(1)}% de diferencia en valor absoluto`,M+12,y+28);
       y+=52;
 
-      // Comparison table
-      checkPage(100);
+        checkPage(100);
       const cmpBody=EMP_MAP.map(m=>{
         const norma=m.normaKeys.reduce((s,k)=>{const l=calc.lineas.find(x=>x.key===k);return s+(l&&l.aplica?l.v:0);},0);
         const emp=Number(d.empresaConceptos[m.empF]||0);
@@ -2339,7 +2319,6 @@ function renderAd(id) {
     footer(doc.internal.getNumberOfPages());
     doc.save(`liquia_liquidacion_${infoId}.pdf`);
 
-    // Restaurar botones
     if (btnPdf) { btnPdf.textContent = origText1; btnPdf.disabled = false; }
     if (btnPdfMain) { btnPdfMain.textContent = origText2; btnPdfMain.disabled = false; }
   }

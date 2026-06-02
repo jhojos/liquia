@@ -829,6 +829,7 @@ function renderAd(id) {
       conceptos: [],
       diasVacacionesDisfrutadas: "0",
       diasVacacionesPendientesAnt: "0",
+      vacHistoricoActivo: false,        // sección opcional de saldo histórico documentado
       cesantiasAnterioresConsignadas: "si",
       cesantiasPendientesAnt: "0",
       primaPagada: "si",
@@ -952,7 +953,8 @@ function renderAd(id) {
     const intR = calcIntereses(cesR.v, diasCes, d.tipoSalario);
     const priR = calcPrima(bc, diasSem, d.tipoSalario);
     const primPend = Number(d.primaPendiente||0);
-    const vacR = calcVacaciones(base.baseVac, dias, d.diasVacacionesDisfrutadas, d.diasVacacionesPendientesAnt, d.tipoSalario, base.baseIntVac);
+    const pendAntVac = d.vacHistoricoActivo ? Number(d.diasVacacionesPendientesAnt||0) : 0;
+    const vacR = calcVacaciones(base.baseVac, dias, d.diasVacacionesDisfrutadas, pendAntVac, d.tipoSalario, base.baseIntVac);
 
     // Salario diario CON auxilio → cesantías, prima, salarios pendientes
     const salDiario = bc/30;
@@ -992,8 +994,8 @@ function renderAd(id) {
     );
     lineas.push(
       { key:"vacaciones", aplica:vacR.aplica, concepto:"Vacaciones compensadas",
-        formula:"(Salario/30) × Días netos",
-        vars:`Base: ${fmtCOP(d.tipoSalario==="integral"?base.baseIntVac:base.baseVac)} (sin auxilio · Art. 192 CST)\nCausados: ${vacR.causados.toFixed(4)} · Disfrutados: ${d.diasVacacionesDisfrutadas||0} · Pend.ant.: ${d.diasVacacionesPendientesAnt||0} · Netos: ${vacR.netos.toFixed(4)}`,
+        formula:"(Salario/30) × Días a compensar",
+        vars:`Base: ${fmtCOP(d.tipoSalario==="integral"?base.baseIntVac:base.baseVac)} (sin auxilio · Art. 192 CST)\nCausados: ${vacR.causados.toFixed(4)} · Disfrutados: ${d.diasVacacionesDisfrutadas||0} · A compensar: ${vacR.netos.toFixed(4)}${pendAntVac>0?` · Saldo histórico documentado: +${pendAntVac}`:''}`,
         ref:"Art. 186 y 189 CST", v:vacR.v },
       { key:"indemnizacion", aplica:indemR.aplica, concepto:"Indemnización por terminación",
         formula: indemR.regla==="bajo" ? "Sal. diario × [30 + 20×(años-1) + 20×fracc.]" :
@@ -1011,8 +1013,8 @@ function renderAd(id) {
     );
     if (extras>0) lineas.push(
       { key:"extras", aplica:true, concepto:"Horas extra / recargos / comisiones pendientes",
-        formula:"Valor declarado", vars:"Monto ingresado por el usuario",
-        ref:"Art. 168 y 179 CST", v:extras }
+        formula:"Valor declarado en pesos", vars:"Monto pendiente ingresado por el usuario (no convertido desde horas)",
+        ref:"Art. 161 y 168 CST · Ley 2101/2021", v:extras }
     );
     const total = lineas.reduce((s,l)=>s+(l.aplica?l.v:0),0);
     return { errors:[], dias, diasCal, diasSem, diasCes, base, salDiario, lineas, total };
@@ -1583,35 +1585,86 @@ function renderAd(id) {
     const d = S.datos;
     const dc = (d.fechaIngreso&&d.fechaTerminacion) ? diasComerciales(d.fechaIngreso,d.fechaTerminacion) : 0;
     const causados = (15*dc)/360;
-    const netos = causados - Number(d.diasVacacionesDisfrutadas||0) + Number(d.diasVacacionesPendientesAnt||0);
+    const disf = Number(d.diasVacacionesDisfrutadas||0);
+    const pendAnt = d.vacHistoricoActivo ? Number(d.diasVacacionesPendientesAnt||0) : 0;
+    const aCompensar = Math.max(0, causados - disf + pendAnt);
+    const overLimit = disf > causados && causados > 0;
+    const showZeroWarning = disf === 0 && dc > 360;
+
     return `
     <div class="step-header">
       <h2>${t("s3title")}</h2>
       <p>${t("s3sub")}</p>
     </div>
-    <div class="form-grid">
+    <div class="stack gap-20">
+
+      <!-- Campo principal: días disfrutados -->
       <div class="field">
-        <div class="field-label">Días de vacaciones disfrutados (toda la relación)</div>
-        <input type="number" inputmode="decimal" min="0" step="0.5" name="diasVacacionesDisfrutadas"
-          value="${d.diasVacacionesDisfrutadas||"0"}" placeholder="0"/>
-        <span class="field-hint">Días efectivamente tomados como vacaciones durante todo el contrato.</span>
+        <div class="field-label">Días de vacaciones disfrutados durante toda la relación laboral</div>
+        <input type="number" inputmode="decimal" min="0" max="${causados.toFixed(1)}" step="0.5"
+          name="diasVacacionesDisfrutadas"
+          value="${d.diasVacacionesDisfrutadas||"0"}" placeholder="0"
+          class="${overLimit?'err':''}"/>
+        <span class="field-hint">Días que tomaste físicamente como vacaciones en cualquier momento del contrato.
+          ${causados>0?`Máximo posible según las fechas ingresadas: <strong>${causados.toFixed(1)} días</strong>.`:''}</span>
+        ${overLimit?`<span class="field-error visible">Los días disfrutados (${disf}) superan los causados (${causados.toFixed(1)}). Revisa el dato.</span>`:''}
+        ${showZeroWarning&&!overLimit?`<span class="field-hint" style="color:var(--amber);margin-top:4px;display:block;">⚠ Para un contrato de <strong>${tiempoHumano(dc)}</strong>, es inusual no haber tomado ningún día de vacaciones. Confirma que este dato es correcto.</span>`:''}
       </div>
-      <div class="field">
-        <div class="field-label">Días pendientes de períodos anteriores</div>
-        <input type="number" inputmode="decimal" min="0" step="0.5" name="diasVacacionesPendientesAnt"
-          value="${d.diasVacacionesPendientesAnt||"0"}" placeholder="0"/>
-        <span class="field-hint">Vacaciones causadas en períodos anteriores no disfrutadas ni compensadas.</span>
-      </div>
-      <div class="full">
-        <div class="live-preview" id="vac-preview">
-          <div class="lp-label">Estimado de vacaciones a compensar</div>
-          <div style="display:flex;gap:24px;flex-wrap:wrap;">
-            <div><div class="lp-label">Días causados</div><div class="lp-val">${causados.toFixed(2)}</div></div>
-            <div><div class="lp-label">Días a pagar (neto)</div><div class="lp-val" id="vac-netos">${Math.max(0,netos).toFixed(2)}</div></div>
+
+      <!-- Preview determinístico -->
+      <div class="live-preview">
+        <div class="lp-label">Vacaciones a compensar en esta liquidación</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;">
+          <div>
+            <div class="lp-label">Causados (calculado)</div>
+            <div class="lp-val">${causados.toFixed(2)} días</div>
           </div>
-          <div class="field-hint" style="margin-top:6px;">Fórmula: 15 días × días trabajados / 360 (Art. 186 CST)</div>
+          <div style="font-size:20px;color:var(--muted);padding-bottom:2px;">−</div>
+          <div>
+            <div class="lp-label">Disfrutados (declarado)</div>
+            <div class="lp-val">${disf.toFixed(1)} días</div>
+          </div>
+          ${pendAnt>0?`
+          <div style="font-size:20px;color:var(--muted);padding-bottom:2px;">+</div>
+          <div>
+            <div class="lp-label">Saldo histórico documentado</div>
+            <div class="lp-val">${pendAnt.toFixed(1)} días</div>
+          </div>`:''}
+          <div style="font-size:20px;color:var(--muted);padding-bottom:2px;">=</div>
+          <div>
+            <div class="lp-label">A compensar</div>
+            <div class="lp-val" id="vac-netos" style="color:var(--brand-mid);font-size:20px;">${aCompensar.toFixed(2)} días</div>
+          </div>
         </div>
+        <div class="field-hint" style="margin-top:8px;">Art. 186 y 189 CST · Los causados los calcula la herramienta desde las fechas del contrato.</div>
       </div>
+
+      <!-- Sección opcional: saldo histórico documentado -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--s2);">
+        <div id="vac-hist-trigger" style="padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:52px;">
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--t2);">Tengo saldo de vacaciones de períodos anteriores con documentación</div>
+            <div class="field-hint" style="margin-top:2px;">Solo si tienes constancia escrita de vacaciones no pagadas de años anteriores</div>
+          </div>
+          <span id="vac-hist-arrow" style="font-family:var(--mono);font-size:12px;color:var(--muted);flex-shrink:0;">${d.vacHistoricoActivo?'▲ Ocultar':'▼ Agregar'}</span>
+        </div>
+        ${d.vacHistoricoActivo?`
+        <div style="padding:0 16px 16px;border-top:1px solid var(--border);">
+          <div class="disclaimer" style="margin:14px 0;">
+            <strong>Solo para casos documentados.</strong> Este campo aplica cuando el empleador adeuda vacaciones
+            de períodos anteriores que nunca se pagaron ni disfrutaron, y existe constancia escrita:
+            cartas, liquidaciones parciales o acuerdos firmados. Sin documentación, este campo debe quedar en cero.
+          </div>
+          <div class="field">
+            <div class="field-label">Días de vacaciones de períodos anteriores pendientes</div>
+            <input type="number" inputmode="decimal" min="0" step="0.5"
+              name="diasVacacionesPendientesAnt"
+              value="${d.diasVacacionesPendientesAnt||"0"}" placeholder="0"/>
+            <span class="field-hint">Solo el saldo que puedas acreditar con documentación.</span>
+          </div>
+        </div>`:''}
+      </div>
+
     </div>`;
   }
 
@@ -1681,10 +1734,14 @@ function renderAd(id) {
         <span class="field-hint">Días entre el último corte de nómina y la fecha de terminación.</span>
       </div>
       <div class="field">
-        <div class="field-label">Horas extra, recargos o comisiones pendientes</div>
+        <div class="field-label">Valor pendiente por horas extra, recargos o comisiones</div>
         <input type="number" inputmode="decimal" min="0" name="extrasPend"
           value="${d.extrasComisionesPend||"0"}" placeholder="0"/>
-        <span class="field-hint">Suma total de conceptos variables del último período no liquidados.</span>
+        <span class="field-hint">
+          Ingresa el <strong>monto total en pesos ($)</strong> que la empresa te adeuda por estos conceptos,
+          no el número de horas. Si tienes horas extra pendientes, consulta tu liquidación de nómina
+          para obtener el valor ya calculado. Límite legal: máx. 2 horas extra/día y 12 h/semana (Art. 161 CST · Ley 2101/2021).
+        </span>
       </div>
     </div>
     <div class="disclaimer mt-24">
@@ -1736,8 +1793,13 @@ function renderAd(id) {
       });
     }
     if (s===3) {
-      bind(`input[name="diasVacacionesDisfrutadas"]`, v=>{ d.diasVacacionesDisfrutadas=v; refreshVacPreview(); });
-      bind(`input[name="diasVacacionesPendientesAnt"]`, v=>{ d.diasVacacionesPendientesAnt=v; refreshVacPreview(); });
+      bind(`input[name="diasVacacionesDisfrutadas"]`, v=>{ d.diasVacacionesDisfrutadas=v; save(); renderWizard(); });
+      bind(`input[name="diasVacacionesPendientesAnt"]`, v=>{ d.diasVacacionesPendientesAnt=v; save(); });
+      document.getElementById("vac-hist-trigger")?.addEventListener("click", ()=>{
+        d.vacHistoricoActivo = !d.vacHistoricoActivo;
+        if (!d.vacHistoricoActivo) d.diasVacacionesPendientesAnt = "0";
+        save(); renderWizard();
+      });
     }
     if (s===4) {
       document.querySelectorAll(`input[name="cesAntCon"]`).forEach(r=>r.addEventListener("change", e=>{
@@ -1772,14 +1834,6 @@ function renderAd(id) {
       });
     } else { wrap.style.display="none"; }
   }
-  function refreshVacPreview() {
-    const d=S.datos;
-    const dc=(d.fechaIngreso&&d.fechaTerminacion)?diasComerciales(d.fechaIngreso,d.fechaTerminacion):0;
-    const causados=(15*dc)/360;
-    const netos=causados-Number(d.diasVacacionesDisfrutadas||0)+Number(d.diasVacacionesPendientesAnt||0);
-    const el=document.getElementById("vac-netos");
-    if(el) el.textContent=Math.max(0,netos).toFixed(2);
-  }
   function refreshPromLive() {
     const d=S.datos;
     if(d.tipoSalario!=="variable"||d.modoVariable!=="mensual") return;
@@ -1804,6 +1858,16 @@ function renderAd(id) {
         return Number(d.salarioIntegral)||0;
       })();
       if(sal<=0){flashErr("Ingresa el valor del salario para continuar.");return false;}
+    }
+    if (S.step===3) {
+      const dc = (d.fechaIngreso&&d.fechaTerminacion) ? diasComerciales(d.fechaIngreso,d.fechaTerminacion) : 0;
+      const causados = (15*dc)/360;
+      const disf = Number(d.diasVacacionesDisfrutadas||0);
+      if(disf < 0){flashErr("Los días disfrutados no pueden ser negativos.");return false;}
+      if(causados > 0 && disf > causados){
+        flashErr(`Los días disfrutados (${disf}) superan los causados (${causados.toFixed(1)}). Revisa el dato.`);
+        return false;
+      }
     }
     save(); return true;
   }

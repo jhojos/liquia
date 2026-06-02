@@ -269,7 +269,6 @@ input.err,select.err{border-color:var(--red)}
 
 /* ---- Tables ---- */
 table.data{width:100%;border-collapse:collapse;font-size:14px}
-.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r-lg)}
 @media(max-width:600px){table.data{font-size:13px}}
 table.data th,table.data td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
 table.data thead th{background:var(--s2);font-weight:600;font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border-s)}
@@ -294,7 +293,7 @@ table.data tr.neg td.diff{color:var(--red)}
 .gap-4{gap:4px}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-20{gap:20px}.gap-24{gap:24px}
 .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .row-between{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.mt-12{margin-top:12px}
+
 .mt-16{margin-top:16px}.mt-20{margin-top:20px}.mt-24{margin-top:24px}
 .mb-4{margin-bottom:4px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}
 .mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-24{margin-bottom:24px}
@@ -573,7 +572,6 @@ table.data tr.neg td.diff{color:var(--red)}
   </main>
 
   <footer class="app-footer">
-    <!-- Ad Slot 6: Footer -->
     <div id="ad-footer-wrap" style="max-width:728px;margin:0 auto 16px;"></div>
     <div><strong>Liquia</strong> · Calculadora de Liquidación Laboral en Colombia · Cálculo basado en <strong>CST · Ley 2466/2025 · Decreto 0159/2026</strong>.</div>
     <div style="margin-top:4px;">
@@ -817,6 +815,7 @@ function renderAd(id) {
       tipoContrato: "indefinido",
       fechaIngreso: "",
       fechaTerminacion: "",
+      fechaVencimientoFijo: "",   // solo para contratos a término fijo
       motivoTerminacion: "despido_sin_justa",
       tipoSalario: "fijo",
       salarioFijo: "",
@@ -827,15 +826,15 @@ function renderAd(id) {
       auxTransporteModo: "auto",
       modalidadLaboral: "presencial",
       conceptos: [],
-      diasVacacionesDisfrutadas: "0",
-      diasVacacionesPendientesAnt: "0",
+      diasVacacionesDisfrutadas: "",          // vacío por defecto (placeholder muestra 0)
+      diasVacacionesPendientesAnt: "",          // vacío por defecto (placeholder muestra 0)
       vacHistoricoActivo: false,        // sección opcional de saldo histórico documentado
       cesantiasAnterioresConsignadas: "si",
-      cesantiasPendientesAnt: "0",
+      cesantiasPendientesAnt: "",          // vacío por defecto (placeholder muestra 0)
       primaPagada: "si",
-      primaPendiente: "0",
-      diasSalariosPendientes: "0",
-      extrasComisionesPend: "0",
+      primaPendiente: "",          // vacío por defecto (placeholder muestra 0)
+      diasSalariosPendientes: "",          // vacío por defecto (placeholder muestra 0)
+      extrasComisionesPend: "",          // vacío por defecto (placeholder muestra 0)
       fueroEspecial: false,
       periodoPrueba: false,
       empresaConceptos: { cesantias:"", intereses:"", prima:"", vacaciones:"", indemnizacion:"", salarios:"", otros:"" }
@@ -924,7 +923,23 @@ function renderAd(id) {
       }
       return {v:salDiario*nd, aplica:true, dias:nd, regla:alto?"alto":"bajo"};
     }
-    if (tc==="fijo") return {v:0, aplica:true, nota:"Contrato a término fijo: ingresa el monto correspondiente en la sección de empresa (Art. 64 CST)."};
+    if (tc==="fijo") {
+      // Art. 64 CST §2: pagar salarios del tiempo que faltare para cumplir el plazo
+      const fv = parseDate(d.fechaVencimientoFijo);
+      const ft = parseDate(ff);
+      if (fv && ft && fv > ft) {
+        const diasRestantes = diasComerciales(ft, fv);
+        const v = Math.max(salDiario*15, salDiario*diasRestantes); // mínimo 15 días
+        return {v, aplica:true, dias:diasRestantes,
+          nota:`Tiempo restante del contrato: ${diasRestantes} días comerciales (mínimo: 15 días · Art. 64 CST)`};
+      }
+      if (fv && ft && fv <= ft) {
+        return {v:0, aplica:false, nota:"El contrato venció antes o en la fecha de terminación: no hay indemnización por término cumplido."};
+      }
+      // Sin fecha de vencimiento ingresada: no se puede calcular
+      return {v:0, aplica:true,
+        nota:"Ingresa la fecha de vencimiento pactada (Paso 1) para calcular la indemnización (Art. 64 CST §2)."};
+    }
     if (tc==="obra") return {v:salDiario*15, aplica:true, nota:"Mínimo 15 días de salario (Art. 64 CST)."};
     return {v:0, aplica:false};
   }
@@ -1000,9 +1015,18 @@ function renderAd(id) {
       { key:"indemnizacion", aplica:indemR.aplica, concepto:"Indemnización por terminación",
         formula: indemR.regla==="bajo" ? "Sal. diario × [30 + 20×(años-1) + 20×fracc.]" :
                  indemR.regla==="alto" ? "Sal. diario × [20 + 15×(años-1) + 15×fracc.]" :
+                 indemR.dias  ? "Sal. diario × días restantes del contrato (mín. 15)" :
                  indemR.aplica ? "Según tipo de contrato" : "No aplica",
-        vars: indemR.aplica ? `Sal. diario sin auxilio: ${fmtCOP(salDiarioPuro)} · Días indem.: ${indemR.dias?.toFixed(2)||"n/a"} · Base: salario ordinario sin auxilio (Art. 128 CST)` : (indemR.nota||"—"),
-        nota: base.aplica && indemR.aplica ? `Auxilio de transporte excluido de la base (Art. 64 y 128 CST · Ley 1/1963 Art. 7 no aplica a indemnización)` : indemR.nota,
+        vars: (indemR.regla==="bajo"||indemR.regla==="alto")
+          ? `Sal. diario sin auxilio: ${fmtCOP(salDiarioPuro)} · Días indem.: ${indemR.dias?.toFixed(2)} · Base: salario ordinario sin auxilio (Art. 128 CST)`
+          : (indemR.aplica && indemR.dias)
+          ? `Sal. diario sin auxilio: ${fmtCOP(salDiarioPuro)} · Días restantes del contrato: ${indemR.dias} · Mínimo legal: 15 días (Art. 64 CST §2)`
+          : (indemR.aplica && !indemR.dias)
+          ? (indemR.nota || "Ingresa la fecha de vencimiento pactada para calcular este valor.")
+          : (indemR.nota||"—"),
+        nota: (indemR.regla==="bajo"||indemR.regla==="alto"||indemR.dias) && base.aplica
+          ? `Auxilio de transporte excluido de la base (Art. 64 y 128 CST · Ley 1/1963 Art. 7 no aplica a indemnización)`
+          : null,
         ref:"Art. 64 CST", v:indemR.v||0 }
     );
     if (diasSalPend>0) lineas.push(
@@ -1173,10 +1197,8 @@ function renderAd(id) {
     const el = document.getElementById("screen-landing");
     el.innerHTML = `
     <div class="landing-wrap">
-      <!-- Ad Slot 1: Landing Superior -->
       <div style="max-width:728px;margin:0 auto;">${renderAd("ad-landing-top")}</div>
 
-      <!-- Hero -->
       <div class="hero-section">
         <div style="max-width:600px;margin:0 auto;">
           <div class="hero-badge">Liquia · Colombia · CST + Ley 2466/2025 · Decreto 0159/2026</div>
@@ -1185,7 +1207,6 @@ function renderAd(id) {
           <button class="hero-cta" id="btn-start">Calcular ahora <span style="font-size:20px;">→</span></button>
           <p class="hero-legal">⚠ Liquia no constituye asesoría jurídica · Solo fines informativos</p>
 
-          <!-- Trust bar — señales de confianza -->
           <div class="trust-bar" role="list" aria-label="Valores de Liquia">
 
             <div class="trust-item" role="listitem">
@@ -1270,7 +1291,6 @@ function renderAd(id) {
         </div>
       </div>
 
-      <!-- Ad Slot 2: Landing Central -->
       <div class="landing-extra" style="text-align:center;">
         <div style="max-width:336px;margin:0 auto 28px;">${renderAd("ad-landing-mid")}</div>
         <div class="disclaimer" style="max-width:600px;margin:0 auto;text-align:left;">
@@ -1355,7 +1375,6 @@ function renderAd(id) {
         </div>
       </div>
 
-      <!-- Desktop ad sidebar — Slot 3 -->
       <div class="wizard-aside">
         ${renderAd("ad-wizard-side")}
       </div>
@@ -1449,6 +1468,12 @@ function renderAd(id) {
         <div class="field-label">Fecha de terminación</div>
         <input type="date" name="fechaTerminacion" value="${d.fechaTerminacion}" inputmode="none"/>
       </div>
+      ${d.tipoContrato==="fijo"?`
+      <div class="field">
+        <div class="field-label">Fecha de vencimiento pactada del contrato</div>
+        <input type="date" name="fechaVencimientoFijo" value="${d.fechaVencimientoFijo}" inputmode="none"/>
+        <span class="field-hint">Necesaria para calcular la indemnización (Art. 64 CST §2): si el despido ocurrió antes del vencimiento, se pagan los salarios del tiempo restante.</span>
+      </div>`:''}
       <div class="full" id="time-preview" style="${dc?'':'display:none;'}">
         <div class="live-preview">
           <div class="lp-label">Tiempo de servicio calculado (año comercial 360/30)</div>
@@ -1603,7 +1628,7 @@ function renderAd(id) {
         <div class="field-label">Días de vacaciones disfrutados durante toda la relación laboral</div>
         <input type="number" inputmode="decimal" min="0" max="${causados.toFixed(1)}" step="0.5"
           name="diasVacacionesDisfrutadas"
-          value="${d.diasVacacionesDisfrutadas||"0"}" placeholder="0"
+          value="${d.diasVacacionesDisfrutadas||""}" placeholder="0"
           class="${overLimit?'err':''}"/>
         <span class="field-hint">Días que tomaste físicamente como vacaciones en cualquier momento del contrato.
           ${causados>0?`Máximo posible según las fechas ingresadas: <strong>${causados.toFixed(1)} días</strong>.`:''}</span>
@@ -1659,7 +1684,7 @@ function renderAd(id) {
             <div class="field-label">Días de vacaciones de períodos anteriores pendientes</div>
             <input type="number" inputmode="decimal" min="0" step="0.5"
               name="diasVacacionesPendientesAnt"
-              value="${d.diasVacacionesPendientesAnt||"0"}" placeholder="0"/>
+              value="${d.diasVacacionesPendientesAnt||""}" placeholder="0"/>
             <span class="field-hint">Solo el saldo que puedas acreditar con documentación.</span>
           </div>
         </div>`:''}
@@ -1694,7 +1719,7 @@ function renderAd(id) {
           <div class="field">
             <div class="field-label">Cesantías pendientes de años anteriores</div>
             <input type="number" inputmode="decimal" min="0" name="cesantiasPendientesAnt"
-              value="${d.cesantiasPendientesAnt||"0"}" placeholder="0"/>
+              value="${d.cesantiasPendientesAnt||""}" placeholder="0"/>
             <span class="field-hint">Saldo que el fondo no tiene consignado de períodos anteriores.</span>
           </div>
         </div>
@@ -1710,7 +1735,7 @@ function renderAd(id) {
           <div class="field">
             <div class="field-label">Prima pendiente del semestre anterior (si aplica)</div>
             <input type="number" inputmode="decimal" min="0" name="primaPendiente"
-              value="${d.primaPendiente||"0"}" placeholder="0"/>
+              value="${d.primaPendiente||""}" placeholder="0"/>
             <span class="field-hint">Solo si el semestre anterior no fue pagado completo.</span>
           </div>
         </div>
@@ -1730,13 +1755,13 @@ function renderAd(id) {
       <div class="field">
         <div class="field-label">Días del último mes trabajados y no pagados</div>
         <input type="number" inputmode="decimal" min="0" step="1" name="diasSalPend"
-          value="${d.diasSalariosPendientes||"0"}" placeholder="0"/>
+          value="${d.diasSalariosPendientes||""}" placeholder="0"/>
         <span class="field-hint">Días entre el último corte de nómina y la fecha de terminación.</span>
       </div>
       <div class="field">
         <div class="field-label">Valor pendiente por horas extra, recargos o comisiones</div>
         <input type="number" inputmode="decimal" min="0" name="extrasPend"
-          value="${d.extrasComisionesPend||"0"}" placeholder="0"/>
+          value="${d.extrasComisionesPend||""}" placeholder="0"/>
         <span class="field-hint">
           Ingresa el <strong>monto total en pesos ($)</strong> que la empresa te adeuda por estos conceptos,
           no el número de horas. Si tienes horas extra pendientes, consulta tu liquidación de nómina
@@ -1767,6 +1792,7 @@ function renderAd(id) {
       bind(`select[name="motivoTerminacion"]`, v=>d.motivoTerminacion=v);
       bind(`input[name="fechaIngreso"]`, v=>{ d.fechaIngreso=v; refreshDatePreview(); });
       bind(`input[name="fechaTerminacion"]`, v=>{ d.fechaTerminacion=v; refreshDatePreview(); });
+      bind(`input[name="fechaVencimientoFijo"]`, v=>{ d.fechaVencimientoFijo=v; save(); });
       bindCb(`input[name="periodoPrueba"]`, v=>d.periodoPrueba=v);
       bindCb(`input[name="fueroEspecial"]`, v=>d.fueroEspecial=v);
     }
@@ -1926,7 +1952,6 @@ function renderAd(id) {
         <strong>Liquia es informativa.</strong> No constituye asesoría jurídica. La exactitud depende de los datos ingresados. Ante dudas, consulte con un abogado laboralista o el Ministerio de Trabajo.
       </div>
 
-      <!-- Ad Slot 4: Resultados Superior -->
       <div class="mb-24">${renderAd("ad-res-top")}</div>
 
       <div class="row-between mb-24">
@@ -2003,7 +2028,6 @@ function renderAd(id) {
         </div>
       </div>
 
-      <!-- Ad Slot 5: Resultados Central -->
       <div class="mb-24" style="max-width:336px;margin-left:auto;margin-right:auto;">${renderAd("ad-res-mid")}</div>
 
       <!-- Empresa comparison (optional, expandable) -->

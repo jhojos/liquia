@@ -244,6 +244,66 @@ input.err,select.err{border-color:var(--red)}
 .band-p{background:var(--brand-light);border-color:#b3cde0;color:var(--brand-mid)}
 .band-s{background:var(--amber-bg);border-color:#e8c36a;color:var(--amber)}
 .band-a{background:var(--red-bg);border-color:#f0b8b8;color:var(--red)}
+/* ── Modal PDF ──────────────────────────────────────────────── */
+.pdf-modal-overlay{
+  position:fixed;inset:0;background:rgba(4,27,106,.45);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;pointer-events:none;transition:opacity 160ms
+}
+.pdf-modal-overlay.open{opacity:1;pointer-events:auto}
+.pdf-modal{
+  background:#fff;border-radius:12px;width:100%;max-width:520px;
+  box-shadow:0 20px 60px rgba(4,27,106,.25);overflow:hidden;
+  transform:translateY(12px);transition:transform 160ms
+}
+.pdf-modal-overlay.open .pdf-modal{transform:translateY(0)}
+.pdf-modal-header{
+  background:var(--grad-hero);color:#fff;padding:20px 24px 16px;
+}
+.pdf-modal-header h3{font-size:17px;font-weight:700;margin:0 0 4px}
+.pdf-modal-header p{font-size:13px;opacity:.82;margin:0;line-height:1.4}
+.pdf-modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.pdf-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.pdf-modal-grid{grid-template-columns:1fr}}
+.pdf-modal-field label{display:block;font-size:12px;font-weight:600;
+  color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.pdf-modal-field input{
+  width:100%;border:1.5px solid var(--border-s);border-radius:var(--r);
+  padding:9px 12px;font-size:14px;font-family:var(--font);color:var(--text);
+  background:#fff;transition:border-color 100ms;box-sizing:border-box
+}
+.pdf-modal-field input:focus{outline:none;border-color:var(--brand-mid)}
+.pdf-modal-footer{
+  padding:16px 24px 20px;display:flex;gap:10px;
+  border-top:1px solid var(--border);flex-wrap:wrap
+}
+.pdf-modal-skip{
+  background:none;border:1.5px solid var(--border-s);color:var(--muted);
+  border-radius:var(--r);padding:10px 16px;font-size:13px;cursor:pointer;
+  font-family:var(--font);transition:border-color 100ms,color 100ms;flex:1;min-height:44px
+}
+.pdf-modal-skip:hover{border-color:var(--brand-mid);color:var(--brand-mid)}
+.pdf-modal-submit{
+  background:var(--grad-brand);color:#fff;border:none;border-radius:var(--r);
+  padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:var(--font);flex:2;min-height:44px;transition:opacity 100ms
+}
+.pdf-modal-submit:hover{opacity:.88}
+/* Nota de transparencia */
+.pdf-free-note{
+  display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);
+  padding:10px 14px;background:var(--s2);border-radius:var(--r);
+  border:1px solid var(--border);margin-top:4px;line-height:1.4
+}
+.pdf-free-note span:first-child{font-size:16px;flex-shrink:0}
+/* Badge de descarga gratuita junto al botón */
+.pdf-free-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:500;color:var(--green);
+  background:var(--green-bg);border:1px solid #a8d9bf;
+  border-radius:99px;padding:3px 10px;margin-top:8px
+}
+
 .disclaimer{
   background:var(--amber-bg);border:1px solid #e8c36a;border-left:4px solid var(--accent);
   border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--amber);line-height:1.5
@@ -837,7 +897,9 @@ function renderAd(id) {
       extrasComisionesPend: "",          // vacío por defecto (placeholder muestra 0)
       fueroEspecial: false,
       periodoPrueba: false,
-      empresaConceptos: { cesantias:"", intereses:"", prima:"", vacaciones:"", indemnizacion:"", salarios:"", otros:"" }
+      empresaConceptos: { cesantias:"", intereses:"", prima:"", vacaciones:"", indemnizacion:"", salarios:"", otros:"" },
+      // Datos para personalizar el PDF (opcionales, no bloquean la descarga)
+      pdfForm: { nombre:"", cedula:"", cargo:"", empleador:"", nit:"", ciudad:"" }
     }
   });
   let S = (() => {
@@ -2097,8 +2159,11 @@ function renderAd(id) {
         <div class="card-body" style="text-align:center;">
           <div style="font-size:28px;margin-bottom:10px;">📄</div>
           <h3 style="margin-bottom:8px;">Descarga el informe completo</h3>
-          <p class="text-muted text-sm mb-20">PDF profesional con todas las fórmulas, referencias legales, tabla comparativa y recomendaciones.</p>
+          <p class="text-muted text-sm mb-20">PDF profesional con fórmulas, referencias legales (Art. 64, 186, 249, 306 CST), tabla comparativa y recomendaciones de acción.</p>
           <button class="btn btn-primary btn-lg" id="btn-pdf-main">⬇ Descargar informe PDF</button>
+          <div style="display:flex;justify-content:center;">
+            <span class="pdf-free-badge">✓ Gratuito · Podría ser premium en futuras versiones</span>
+          </div>
         </div>
       </div>
 
@@ -2109,7 +2174,49 @@ function renderAd(id) {
     </div>`;
 
     document.getElementById("btn-edit")?.addEventListener("click",()=>{ S.step=1; save(); renderWizard(); goTo("wizard"); });
-    [document.getElementById("btn-pdf"), document.getElementById("btn-pdf-main")].forEach(b=>b?.addEventListener("click",()=>generarPDF(calc,alertas,infoId)));
+
+    // Botones PDF → abrir modal de personalización
+    function openPdfModal() {
+      const d = S.datos;
+      const pf = d.pdfForm || {};
+      // Pre-rellenar con datos guardados si existen
+      ['nombre','cedula','cargo','empleador','nit','ciudad'].forEach(k=>{
+        const el = document.getElementById(`pf-${k}`);
+        if (el) el.value = pf[k] || '';
+      });
+      document.getElementById('pdf-modal-overlay')?.classList.add('open');
+    }
+    function closePdfModal() {
+      document.getElementById('pdf-modal-overlay')?.classList.remove('open');
+    }
+    function doGenerarPDF(skipForm) {
+      const d = S.datos;
+      if (!skipForm) {
+        // Guardar datos del formulario en el estado
+        d.pdfForm = {
+          nombre:    document.getElementById('pf-nombre')?.value.trim()   || '',
+          cedula:    document.getElementById('pf-cedula')?.value.trim()   || '',
+          cargo:     document.getElementById('pf-cargo')?.value.trim()    || '',
+          empleador: document.getElementById('pf-empleador')?.value.trim()|| '',
+          nit:       document.getElementById('pf-nit')?.value.trim()      || '',
+          ciudad:    document.getElementById('pf-ciudad')?.value.trim()   || '',
+        };
+        save();
+      }
+      closePdfModal();
+      generarPDF(calc, alertas, infoId);
+    }
+
+    [document.getElementById("btn-pdf"), document.getElementById("btn-pdf-main")]
+      .forEach(b => b?.addEventListener("click", openPdfModal));
+    document.getElementById('pdf-modal-skip')?.addEventListener('click', ()=>doGenerarPDF(true));
+    document.getElementById('pdf-modal-submit')?.addEventListener('click', ()=>doGenerarPDF(false));
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('pdf-modal-overlay')?.addEventListener('click', e=>{
+      if (e.target.id==='pdf-modal-overlay') closePdfModal();
+    });
+    // Cerrar con Escape
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePdfModal(); });
     document.getElementById("btn-reset")?.addEventListener("click",()=>{
       if(confirm("¿Borrar todos los datos y empezar un cálculo nuevo?")){ reset(); window._iid=null; renderLanding(); renderRol(); goTo("landing"); }
     });
@@ -2353,12 +2460,45 @@ function renderAd(id) {
 
     /* ── COMPOSICIÓN DEL DOCUMENTO ─────────────────────────── */
     const d = S.datos;
+    const pf = d.pdfForm || {};
+    const tieneDatosPF = pf.nombre || pf.empleador; // al menos uno de los dos campos clave
+
+    // ── Flag de monetización futura (arquitectura preparada) ──
+    // Para activar la pasarela de pago, cambiar a 'payment' y
+    // conectar con la pasarela elegida. En 'free', la descarga
+    // es directa sin restricciones.
+    const PDF_MODE = 'free'; // valores posibles: 'free' | 'payment'
+    // (En versión de pago, este punto sería el gate de verificación del token)
+
     newPage();
+
+    // ┌─────────────────────────────────────────────────────┐
+    // │  PARTES (solo si el usuario completó el formulario)  │
+    // └─────────────────────────────────────────────────────┘
+    if (tieneDatosPF) {
+      need(60);
+      // Fila de identificación compacta — dos columnas
+      const partesRows = [];
+      if (pf.nombre)    partesRows.push(["Trabajador",     pf.nombre + (pf.cedula ? `  ·  C.C. ${pf.cedula}` : '')]);
+      if (pf.cargo)     partesRows.push(["Cargo",          pf.cargo]);
+      if (pf.empleador) partesRows.push(["Empleador",      pf.empleador + (pf.nit ? `  ·  NIT/CC ${pf.nit}` : '')]);
+      if (pf.ciudad)    partesRows.push(["Ciudad",         pf.ciudad]);
+      doc.autoTable(tableBase({
+        startY: pageY,
+        head: [["Campo", "Dato"]],
+        body: partesRows,
+        columnStyles: {
+          0: { cellWidth: 100, fontStyle:"bold", textColor: P.sub },
+          1: { halign:"left" },
+        },
+      }));
+      pageY = doc.lastAutoTable.finalY + 18;
+    }
 
     // ┌─────────────────────────────────────────────────────┐
     // │  SECCIÓN 1 — DATOS DEL CONTRATO                     │
     // └─────────────────────────────────────────────────────┘
-    secTitle("1. Datos del contrato");
+    secTitle(`${tieneDatosPF ? '2' : '1'}. Datos del contrato`);
 
     const datosRows = [
       ["Tipo de contrato",              labelContrato(d.tipoContrato)],
@@ -2390,7 +2530,9 @@ function renderAd(id) {
     // │  SECCIÓN 2 — LIQUIDACIÓN SEGÚN LA LEY              │
     // └─────────────────────────────────────────────────────┘
     need(120);
-    secTitle("2. Liquidación según la ley");
+    // Offset de numeración: +1 si se mostró la sección de partes
+    const nOff = tieneDatosPF ? 1 : 0;
+    secTitle(`${2+nOff}. Liquidación según la ley`);
 
     // Caja total premium
     calloutBox({
@@ -2442,7 +2584,7 @@ function renderAd(id) {
 
     if (tieneEmp) {
       need(120);
-      secTitle("3. Propuesta de la empresa");
+      secTitle(`${3+nOff}. Propuesta de la empresa`);
 
       const diff = tEmp - calc.total;
       const pct  = calc.total > 0 ? Math.abs(diff / calc.total) * 100 : 0;
@@ -2532,7 +2674,7 @@ function renderAd(id) {
     // ┌─────────────────────────────────────────────────────┐
     // │  SECCIÓN 3/4 — OBSERVACIONES TÉCNICAS              │
     // └─────────────────────────────────────────────────────┘
-    const nObs = tieneEmp ? "4" : "3";
+    const nObs = `${(tieneEmp ? 4 : 3) + nOff}`;
     need(40);
     secTitle(`${nObs}. Observaciones técnicas`);
 
@@ -2568,7 +2710,7 @@ function renderAd(id) {
     // ┌─────────────────────────────────────────────────────┐
     // │  SECCIÓN 4/5 — RECOMENDACIONES                     │
     // └─────────────────────────────────────────────────────┘
-    const nRec = tieneEmp ? "5" : "4";
+    const nRec = `${(tieneEmp ? 5 : 4) + nOff}`;
     need(60);
     secTitle(`${nRec}. Recomendaciones`);
 
@@ -2660,5 +2802,51 @@ function renderAd(id) {
     }
   }
 </script>
+<!-- Modal PDF — datos para personalizar el documento -->
+<div class="pdf-modal-overlay" id="pdf-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title">
+  <div class="pdf-modal">
+    <div class="pdf-modal-header">
+      <h3 id="pdf-modal-title">📄 Personaliza tu informe PDF</h3>
+      <p>Estos datos aparecerán en el encabezado del documento. Son opcionales — puedes saltar este paso.</p>
+    </div>
+    <div class="pdf-modal-body">
+      <div class="pdf-modal-grid">
+        <div class="pdf-modal-field">
+          <label>Nombre del trabajador</label>
+          <input type="text" id="pf-nombre" placeholder="Nombre completo" autocomplete="name"/>
+        </div>
+        <div class="pdf-modal-field">
+          <label>Cédula del trabajador</label>
+          <input type="text" id="pf-cedula" inputmode="numeric" placeholder="Número de cédula"/>
+        </div>
+        <div class="pdf-modal-field">
+          <label>Cargo desempeñado</label>
+          <input type="text" id="pf-cargo" placeholder="Ej: Auxiliar contable"/>
+        </div>
+        <div class="pdf-modal-field">
+          <label>Ciudad</label>
+          <input type="text" id="pf-ciudad" placeholder="Ciudad de trabajo"/>
+        </div>
+        <div class="pdf-modal-field">
+          <label>Empleador o empresa</label>
+          <input type="text" id="pf-empleador" placeholder="Razón social o nombre"/>
+        </div>
+        <div class="pdf-modal-field">
+          <label>NIT o CC del empleador</label>
+          <input type="text" id="pf-nit" inputmode="numeric" placeholder="Opcional"/>
+        </div>
+      </div>
+      <div class="pdf-free-note">
+        <span>🎁</span>
+        <span>El PDF es <strong>gratuito en esta versión</strong> de Liquia. En el futuro, esta función podría estar sujeta a un cobro. Cualquier cambio se comunicará con anticipación y sin afectar cálculos en progreso.</span>
+      </div>
+    </div>
+    <div class="pdf-modal-footer">
+      <button class="pdf-modal-skip" id="pdf-modal-skip" type="button">Saltar y descargar sin personalizar</button>
+      <button class="pdf-modal-submit" id="pdf-modal-submit" type="button">⬇ Generar mi PDF</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

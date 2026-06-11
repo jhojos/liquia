@@ -315,6 +315,73 @@ input.err,select.err{border-color:var(--red)}
   border-radius:99px;padding:3px 10px;margin-top:8px
 }
 
+/* ── Data Review — resumen paso 5 y panel resultados ───────── */
+/* Base: móvil primero, pantallas desde 320px */
+.dr-wrap{
+  background:var(--brand-50);border:1px solid var(--brand-light);
+  border-radius:var(--r);padding:14px;margin-top:20px
+}
+.dr-title{
+  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--brand-mid);display:flex;align-items:center;gap:6px;margin-bottom:12px
+}
+.dr-groups{display:flex;flex-direction:column;gap:8px}
+.dr-group{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden
+}
+.dr-group-label{
+  font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);padding:6px 12px;background:var(--s2);
+  border-bottom:1px solid var(--border)
+}
+.dr-item{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:6px 12px;gap:12px;border-bottom:1px solid var(--border)
+}
+.dr-item:last-child{border-bottom:none}
+.dr-item-label{font-size:12px;color:var(--muted);flex-shrink:0;line-height:1.4}
+.dr-item-value{
+  font-size:12px;font-weight:500;color:var(--text);
+  text-align:right;word-break:break-word;line-height:1.4
+}
+/* En móvil items muy largos van en columna */
+@media(max-width:380px){
+  .dr-item{flex-direction:column;gap:2px}
+  .dr-item-value{text-align:left}
+}
+/* ── Panel colapsable en resultados ────────────────────────── */
+.inputs-panel{
+  border:1px solid var(--border);border-radius:var(--r);
+  margin-bottom:24px;overflow:hidden
+}
+.inputs-trigger{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 16px;cursor:pointer;background:var(--s2);
+  gap:8px;min-height:48px;transition:background 100ms;
+  border:none;width:100%;text-align:left;font-family:var(--font)
+}
+.inputs-trigger:hover{background:var(--brand-50)}
+.inputs-trigger-text{font-size:13px;font-weight:600;color:var(--t2)}
+.inputs-trigger-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.inputs-trigger-icon{
+  color:var(--muted);font-size:14px;flex-shrink:0;
+  transition:transform 200ms;font-family:var(--mono)
+}
+.inputs-panel.open .inputs-trigger-icon{transform:rotate(180deg)}
+.inputs-body{
+  display:none;border-top:1px solid var(--border);
+  background:var(--surface)
+}
+.inputs-panel.open .inputs-body{display:block}
+.inputs-body .dr-groups{padding:12px;gap:8px}
+/* Desktop: grupos en 2 columnas cuando hay espacio */
+@media(min-width:600px){
+  .dr-wrap{padding:16px 18px}
+  .dr-groups-2col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .inputs-body .dr-groups{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+}
+
 .disclaimer{
   background:var(--amber-bg);border:1px solid #e8c36a;border-left:4px solid var(--accent);
   border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--amber);line-height:1.5
@@ -1817,6 +1884,74 @@ function renderAd(id) {
   }
 
   // ---- Step 5: Pagos pendientes ----
+  // ---- Resumen de datos ingresados ----
+  // Usado en el pie del Paso 5 y en el panel colapsable de resultados
+  function buildDataSummary(d) {
+    const dc = (d.fechaIngreso && d.fechaTerminacion)
+      ? diasComerciales(parseDate(d.fechaIngreso), parseDate(d.fechaTerminacion)) : 0;
+    const causados = dc > 0 ? (15 * dc) / 360 : 0;
+    const disf = Number(d.diasVacacionesDisfrutadas) || 0;
+    const aComp = Math.max(0, causados - disf
+      + (d.vacHistoricoActivo ? Number(d.diasVacacionesPendientesAnt||0) : 0));
+
+    const lblContrato = {indefinido:"Término indefinido",fijo:"Término fijo",obra:"Obra o labor",aprendizaje:"Aprendizaje SENA",domestico:"Servicio doméstico"};
+    const lblMotivo   = {renuncia:"Renuncia voluntaria",despido_sin_justa:"Despido sin justa causa",despido_con_justa:"Despido con justa causa",mutuo:"Mutuo acuerdo",vencimiento:"Vencimiento del término",obra_terminada:"Terminación de la obra",muerte:"Muerte del trabajador",abandono:"Abandono del cargo"};
+    const lblSal      = {fijo:"Ordinario fijo",variable:"Ordinario variable",integral:"Integral"};
+
+    const salMonto = d.tipoSalario === 'integral'
+      ? (Number(d.salarioIntegral)||0)
+      : d.tipoSalario === 'variable'
+        ? (Number(d.promedioVariable)||0)
+        : (Number(d.salarioFijo)||0);
+    const auxLabel = d.auxTransporteModo === 'no' ? 'No aplica'
+      : d.auxTransporteModo === 'si' ? 'Sí aplica (manual)'
+      : salMonto > 0 && salMonto <= TOPE_AUX_TRANSPORTE ? `Sí — ${fmtCOP(AUX_TRANSPORTE_2026)}`
+      : 'No aplica (salario > 2 SMMLV)';
+
+    function group(label, items) {
+      const rows = items.filter(([,v])=>v).map(([l,v])=>
+        `<div class="dr-item">
+          <span class="dr-item-label">${l}</span>
+          <span class="dr-item-value">${v}</span>
+        </div>`).join('');
+      return `<div class="dr-group">
+        <div class="dr-group-label">${label}</div>
+        ${rows}
+      </div>`;
+    }
+
+    const g1 = group('📅 Contrato', [
+      ['Tipo',              lblContrato[d.tipoContrato] || d.tipoContrato],
+      ['Terminación',       lblMotivo[d.motivoTerminacion] || d.motivoTerminacion],
+      ['Ingreso',           fmtDate(d.fechaIngreso)],
+      ['Terminación',       fmtDate(d.fechaTerminacion)],
+      ['Tiempo de servicio',dc ? tiempoHumano(dc) + ` · ${dc} días com.` : '—'],
+      d.periodoPrueba ? ['Período de prueba','Sí'] : null,
+      d.fueroEspecial  ? ['Fuero o estabilidad','Sí'] : null,
+    ].filter(Boolean));
+
+    const g2 = group('💰 Remuneración', [
+      ['Tipo de salario',   lblSal[d.tipoSalario] || d.tipoSalario],
+      ['Salario base',      salMonto ? fmtCOP(salMonto) : '—'],
+      ['Auxilio transporte',auxLabel],
+      ['Modalidad',         {presencial:'Presencial',teletrabajo:'Teletrabajo',hibrido:'Híbrido'}[d.modalidadLaboral] || ''],
+    ]);
+
+    const g3 = group('🏖 Vacaciones', [
+      ['Causados (calculado)',  causados > 0 ? causados.toFixed(2) + ' días' : '—'],
+      ['Disfrutados (declarado)', disf > 0 ? disf + ' días' : '0 días'],
+      ['A compensar',           causados > 0 ? aComp.toFixed(2) + ' días' : '—'],
+      d.vacHistoricoActivo ? ['Saldo histórico', '+' + (Number(d.diasVacacionesPendientesAnt)||0) + ' días (documentado)'] : null,
+    ].filter(Boolean));
+
+    const g4 = group('📋 Prestaciones anteriores', [
+      ['Cesantías ant.',    d.cesantiasAnterioresConsignadas === 'si' ? 'Consignadas ✓' : (Number(d.cesantiasPendientesAnt||0) > 0 ? `Pendientes: ${fmtCOP(Number(d.cesantiasPendientesAnt))}` : 'Sin dato')],
+      ['Prima semestre ant.',d.primaPagada === 'si' ? 'Pagada ✓' : (Number(d.primaPendiente||0) > 0 ? `Pendiente: ${fmtCOP(Number(d.primaPendiente))}` : 'Sin dato')],
+    ]);
+
+    return `${g1}${g2}${g3}${g4}`;
+  }
+
   function renderS5() {
     const d = S.datos;
     return `
@@ -1842,8 +1977,19 @@ function renderAd(id) {
         </span>
       </div>
     </div>
-    <div class="disclaimer mt-24">
-      <strong>Listo para calcular.</strong> Con los datos ingresados en los 5 pasos se generará el cálculo completo según la ley. Después podrás compararlo con la propuesta de la empresa si la tienes.
+
+    <!-- Resumen de datos — última revisión antes de calcular -->
+    <div class="dr-wrap">
+      <div class="dr-title">
+        <span>🔍</span> Revisa tu información antes de calcular
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.5;">
+        La precisión del resultado depende de los datos ingresados. Si algo no es correcto, 
+        puedes volver a cualquier paso y corregirlo.
+      </p>
+      <div class="dr-groups dr-groups-2col">
+        ${buildDataSummary(d)}
+      </div>
     </div>`;
   }
 
@@ -2100,6 +2246,22 @@ function renderAd(id) {
 
       <!-- Breakdown -->
       <h3 style="margin-bottom:12px;">Desglose del cálculo</h3>
+
+      <!-- Panel colapsable: datos usados en el cálculo -->
+      <div class="inputs-panel" id="inputs-panel">
+        <button class="inputs-trigger" id="inputs-trigger" type="button" aria-expanded="false" aria-controls="inputs-body">
+          <div>
+            <div class="inputs-trigger-text">📋 Datos utilizados en este cálculo</div>
+            <div class="inputs-trigger-sub">Verifica que los datos son correctos · Toca para ver</div>
+          </div>
+          <span class="inputs-trigger-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="inputs-body" id="inputs-body" role="region">
+          <div class="dr-groups">
+            ${buildDataSummary(S.datos)}
+          </div>
+        </div>
+      </div>
       <div class="breakdown-list mb-24">
         ${calc.lineas.map(l=>{
           const cls=!l.aplica?"bd-na":"";
@@ -2211,6 +2373,14 @@ function renderAd(id) {
     </div>`;
 
     document.getElementById("btn-edit")?.addEventListener("click",()=>{ S.step=1; save(); renderWizard(); goTo("wizard"); });
+
+    // Panel colapsable de datos usados
+    document.getElementById("inputs-trigger")?.addEventListener("click", ()=>{
+      const panel = document.getElementById("inputs-panel");
+      const trigger = document.getElementById("inputs-trigger");
+      const isOpen = panel?.classList.toggle("open");
+      if (trigger) trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
 
     // Botones PDF → abrir modal de personalización
     function openPdfModal() {
